@@ -34,10 +34,19 @@ export async function POST(request: NextRequest) {
     const teacher = await Teacher.create({
       name: body.name,
       email: body.email,
+      password: body.password,
       assigned_subjects: []
     });
 
-    return NextResponse.json(teacher, { status: 201 });
+    // Don't send password in response
+    const teacherResponse = {
+      _id: teacher._id,
+      name: teacher.name,
+      email: teacher.email,
+      assigned_subjects: teacher.assigned_subjects
+    };
+
+    return NextResponse.json(teacherResponse, { status: 201 });
   } catch (error) {
     console.error('Error creating teacher:', error);
     return NextResponse.json({ error: 'Failed to create teacher' }, { status: 500 });

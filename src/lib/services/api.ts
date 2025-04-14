@@ -169,7 +169,7 @@ export const api = {
     return res.json();
   },
 
-  async createTeacher(data: { name: string; email: string }) {
+  async createTeacher(data: { name: string; email: string; password: string }) {
     const res = await fetch(`${BASE_URL}/teachers`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -182,6 +182,7 @@ export const api = {
   async updateTeacher(id: string, data: {
     name?: string;
     email?: string;
+    password?: string;
     assigned_subjects?: Array<{ subject_id: string; division_id: string }>;
   }) {
     const res = await fetch(`${BASE_URL}/teachers/${id}`, {

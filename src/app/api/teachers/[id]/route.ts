@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/connect';
 import Teacher from '@/lib/db/models/Teacher';
+import bcrypt from 'bcryptjs';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   await connectDB();
@@ -15,7 +16,16 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     if (!teacher) {
       return NextResponse.json({ error: 'Teacher not found' }, { status: 404 });
     }
-    return NextResponse.json(teacher);
+
+    // Don't send password in response
+    const teacherResponse = {
+      _id: teacher._id,
+      name: teacher.name,
+      email: teacher.email,
+      assigned_subjects: teacher.assigned_subjects
+    };
+
+    return NextResponse.json(teacherResponse);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch teacher' }, { status: 500 });
   }
@@ -25,7 +35,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   await connectDB();
   try {
     const body = await request.json();
-    const teacher = await Teacher.findByIdAndUpdate(params.id, body, {
+    const updateData = { ...body };
+
+    // If password is provided, hash it
+    if (body.password) {
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(body.password, salt);
+    } else {
+      delete updateData.password; // Don't update password if not provided
+    }
+
+    const teacher = await Teacher.findByIdAndUpdate(params.id, updateData, {
       new: true,
       runValidators: true
     })
@@ -38,7 +58,16 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     if (!teacher) {
       return NextResponse.json({ error: 'Teacher not found' }, { status: 404 });
     }
-    return NextResponse.json(teacher);
+
+    // Don't send password in response
+    const teacherResponse = {
+      _id: teacher._id,
+      name: teacher.name,
+      email: teacher.email,
+      assigned_subjects: teacher.assigned_subjects
+    };
+
+    return NextResponse.json(teacherResponse);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update teacher' }, { status: 500 });
   }
