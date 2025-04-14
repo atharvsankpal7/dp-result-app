@@ -11,13 +11,14 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
 
   // If there's no token and the user is trying to access a protected route
+
   if (!token && !request.nextUrl.pathname.endsWith("/login")) {
     console.log("No token, redirecting to login");
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
   // If there's a token and the user is trying to access the login page
-  if (token && request.nextUrl.pathname.endsWith("/login")) {
+  if (token && request.nextUrl.pathname.startsWith("/login")) {
     console.log("Token found, redirecting to home");
     return NextResponse.redirect(new URL("/", request.url));
   }
@@ -27,12 +28,14 @@ export async function middleware(request: NextRequest) {
     try {
       const secret = new TextEncoder().encode(process.env.JWT_SECRET);
       const { payload } = await jwtVerify(token, secret);
-      console.log(payload)
-      // Redirect based on role
-      if (payload.role === "admin") {
-        return NextResponse.redirect(new URL("/admin/dashboard", request.url));
-      } else if (payload.role === "staff") {
-        return NextResponse.redirect(new URL("/staff/dashboard", request.url));
+      // console.log(payload);
+      if (!payload.role) {
+        return NextResponse.redirect(new URL("/login", request.url));
+      }
+      if (request.nextUrl.pathname === "/") {
+        return NextResponse.redirect(
+          new URL(`${payload.role}/dashboard`, request.url)
+        );
       }
 
       return NextResponse.next();
@@ -41,7 +44,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
-  
+
   return NextResponse.next();
 }
 
