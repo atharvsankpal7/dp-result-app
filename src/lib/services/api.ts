@@ -1,36 +1,8 @@
+import * as XLSX from 'xlsx';
+
 const BASE_URL = '/api';
 
 export const api = {
-  // Subjects
-  async getSubjects() {
-    const res = await fetch(`${BASE_URL}/subjects`);
-    if (!res.ok) throw new Error('Failed to fetch subjects');
-    return res.json();
-  },
-
-  async createSubject(data: any) {
-    const res = await fetch(`${BASE_URL}/subjects`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error('Failed to create subject');
-    return res.json();
-  },
-
-  async updateSubject(id: string, data: any) {
-    const res = await fetch(`${BASE_URL}/subjects/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error('Failed to update subject');
-  },
-
   // Classes
   async getClasses() {
     const res = await fetch(`${BASE_URL}/classes`);
@@ -38,7 +10,7 @@ export const api = {
     return res.json();
   },
 
-  async createClass(data: any) {
+  async createClass(data: { name: string }) {
     const res = await fetch(`${BASE_URL}/classes`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -48,8 +20,16 @@ export const api = {
     return res.json();
   },
 
+  async deleteClass(id: string) {
+    const res = await fetch(`${BASE_URL}/classes/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete class');
+    return res.json();
+  },
+
   // Divisions
-  async createDivision(data: any) {
+  async createDivision(data: { name: string; class_id: string }) {
     const res = await fetch(`${BASE_URL}/divisions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -59,29 +39,43 @@ export const api = {
     return res.json();
   },
 
+  async deleteDivision(id: string) {
+    const res = await fetch(`${BASE_URL}/divisions/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete division');
+    return res.json();
+  },
+
   // Students
-  async uploadStudents(data: any[]) {
-    const res = await fetch(`${BASE_URL}/students/bulk-upload`, {
+  async getStudents() {
+    const res = await fetch(`${BASE_URL}/students`);
+    if (!res.ok) throw new Error('Failed to fetch students');
+    return res.json();
+  },
+
+  async uploadStudents(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const res = await fetch(`${BASE_URL}/students/upload`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ students: data }),
+      body: formData,
     });
     if (!res.ok) throw new Error('Failed to upload students');
     return res.json();
   },
 
-  // Teachers
-  async assignSubjectsToTeacher(teacherId: string, assignments: any[]) {
-    const res = await fetch(`${BASE_URL}/teachers/${teacherId}/assign-subjects`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ assignments }),
-    });
-    if (!res.ok) throw new Error('Failed to assign subjects');
+  // Results
+  async getResults(classId: string, divisionId: string, subjectId: string) {
+    const res = await fetch(
+      `${BASE_URL}/results?class=${classId}&division=${divisionId}&subject=${subjectId}`
+    );
+    if (!res.ok) throw new Error('Failed to fetch results');
     return res.json();
   },
 
-  // Excel Upload Helper
+  // Excel Helper
   async parseExcelFile(file: File): Promise<any[]> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -101,4 +95,4 @@ export const api = {
       reader.readAsBinaryString(file);
     });
   }
-}; 
+};

@@ -9,5 +9,10 @@ const ClassSchema = new mongoose.Schema({
   divisions: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Division'
-  }
-}); 
+  }]
+}, {
+  timestamps: true
+});
+
+const Class = mongoose.models.Class || mongoose.model('Class', ClassSchema);
+export default Class;

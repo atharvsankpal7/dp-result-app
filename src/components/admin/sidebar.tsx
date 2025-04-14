@@ -21,10 +21,10 @@ const Sidebar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigation = [
-    { name: "Students", href: "/admin/students", icon: Users },
-    { name: "Classes", href: "/admin/classes", icon: GraduationCap },
-    { name: "Divisions", href: "/admin/divisions", icon: BookOpen },
-    { name: "Result", href: "/admin/result", icon: FileText },
+    { name: "Students", href: "/admin/dashboard/students", icon: Users },
+    { name: "Classes", href: "/admin/dashboard/classes", icon: GraduationCap },
+    { name: "Divisions", href: "/admin/dashboard/divisions", icon: BookOpen },
+    { name: "Result", href: "/admin/dashboard/result", icon: FileText },
   ];
 
   const isActive = (path: string) => {
