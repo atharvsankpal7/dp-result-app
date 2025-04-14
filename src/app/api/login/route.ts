@@ -1,5 +1,4 @@
 import Staff from "@/lib/db/model/staff";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import connectDB from "@/lib/db/connect";
 

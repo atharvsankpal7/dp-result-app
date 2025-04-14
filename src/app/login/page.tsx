@@ -10,7 +10,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-// import { seedAdmin } from '@/lib/db/seedAdmin'
+import { seedAdmin } from '@/lib/db/seedAdmin'
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -51,7 +51,7 @@ export default function LoginPage() {
       setError('An error occurred during login')
     }
   }
-  // seedAdmin()
+  seedAdmin()
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/50">
       <Card className="max-w-md w-full">
