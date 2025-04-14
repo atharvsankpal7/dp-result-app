@@ -1,19 +1,19 @@
-"use client"
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { 
-  Home, 
-  Users, 
-  GraduationCap, 
+"use client";
+import React, { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  FileText,
+  Users,
+  GraduationCap,
   BookOpen,
-  Calendar,
-  Settings,
+  
+  
   LogOut,
   Menu,
-  X
-} from 'lucide-react';
-import { useRouter } from 'next/navigation';
+  X,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -21,12 +21,10 @@ const Sidebar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigation = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: Home },
-    { name: 'Students', href: '/admin/students', icon: Users },
-    { name: 'Classes', href: '/admin/classes', icon: GraduationCap },
-    { name: 'Divisions', href: '/admin/divisions', icon: BookOpen },
-    { name: 'Schedule', href: '/admin/schedule', icon: Calendar },
-    { name: 'Settings', href: '/admin/settings', icon: Settings },
+    { name: "Students", href: "/admin/students", icon: Users },
+    { name: "Classes", href: "/admin/classes", icon: GraduationCap },
+    { name: "Divisions", href: "/admin/divisions", icon: BookOpen },
+    { name: "Result", href: "/admin/result", icon: FileText },
   ];
 
   const isActive = (path: string) => {
@@ -39,7 +37,7 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     // Implement logout functionality here
-    router.push('/login');
+    router.push("/login");
   };
 
   return (
@@ -61,7 +59,7 @@ const Sidebar = () => {
       {/* Sidebar for mobile */}
       <div
         className={`fixed inset-0 z-40 transform ${
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 ease-in-out md:hidden`}
       >
         <div className="relative flex flex-col w-64 h-full bg-white border-r border-gray-200 pt-16">
@@ -76,15 +74,15 @@ const Sidebar = () => {
                   href={item.href}
                   className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                     isActive(item.href)
-                      ? 'bg-indigo-100 text-indigo-600'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? "bg-indigo-100 text-indigo-600"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}
                 >
                   <item.icon
                     className={`mr-3 flex-shrink-0 h-5 w-5 ${
                       isActive(item.href)
-                        ? 'text-indigo-500'
-                        : 'text-gray-400 group-hover:text-gray-500'
+                        ? "text-indigo-500"
+                        : "text-gray-400 group-hover:text-gray-500"
                     }`}
                     aria-hidden="true"
                   />
@@ -98,7 +96,10 @@ const Sidebar = () => {
               onClick={handleLogout}
               className="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50 w-full"
             >
-              <LogOut className="mr-3 flex-shrink-0 h-5 w-5 text-red-500" aria-hidden="true" />
+              <LogOut
+                className="mr-3 flex-shrink-0 h-5 w-5 text-red-500"
+                aria-hidden="true"
+              />
               Logout
             </button>
           </div>
@@ -118,15 +119,15 @@ const Sidebar = () => {
                 href={item.href}
                 className={`group flex items-center px-3 py-3 text-sm font-medium rounded-md ${
                   isActive(item.href)
-                    ? 'bg-indigo-100 text-indigo-600'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? "bg-indigo-100 text-indigo-600"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
               >
                 <item.icon
                   className={`mr-3 flex-shrink-0 h-5 w-5 ${
                     isActive(item.href)
-                      ? 'text-indigo-500'
-                      : 'text-gray-400 group-hover:text-gray-500'
+                      ? "text-indigo-500"
+                      : "text-gray-400 group-hover:text-gray-500"
                   }`}
                   aria-hidden="true"
                 />
@@ -140,7 +141,10 @@ const Sidebar = () => {
             onClick={handleLogout}
             className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-red-600 hover:bg-red-50 w-full"
           >
-            <LogOut className="mr-3 flex-shrink-0 h-5 w-5 text-red-500" aria-hidden="true" />
+            <LogOut
+              className="mr-3 flex-shrink-0 h-5 w-5 text-red-500"
+              aria-hidden="true"
+            />
             Logout
           </button>
         </div>

@@ -1,4 +1,4 @@
-import Staff from './model/staff';
+import Staff from './models/staff';
 import connectDB from './connect';
 
 export const seedAdmin = async () => {
