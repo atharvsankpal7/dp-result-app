@@ -20,19 +20,35 @@ export async function POST(request: NextRequest) {
 
     const students = await Promise.all(
       data.map(async (row: any) => {
+        // Check if student already exists
+        const existingStudent = await Student.findOne({
+          roll_number: row.roll_number,
+          division_id: row.division_id
+        });
+        
+        if (existingStudent) {
+          throw new Error(`Student with roll number ${row.roll_number} already exists in this division`);
+        }
+
         const student = await Student.create({
           name: row.name,
           mother_name: row.mother_name,
           roll_number: row.roll_number,
           division_id: row.division_id
         });
-        return student;
+
+        return student.populate({
+          path: 'division_id',
+          populate: { path: 'class_id' }
+        });
       })
     );
 
     return NextResponse.json(students, { status: 201 });
   } catch (error) {
     console.error('Error uploading students:', error);
-    return NextResponse.json({ error: 'Failed to upload students' }, { status: 500 });
+    return NextResponse.json({ 
+      error: error instanceof Error ? error.message : 'Failed to upload students' 
+    }, { status: 500 });
   }
 }

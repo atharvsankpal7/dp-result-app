@@ -7,11 +7,10 @@ import {
   Users,
   GraduationCap,
   BookOpen,
-  
-  
   LogOut,
   Menu,
   X,
+  Book,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -23,6 +22,7 @@ const Sidebar = () => {
   const navigation = [
     { name: "Students", href: "/admin/dashboard/students", icon: Users },
     { name: "Classes", href: "/admin/dashboard/classes", icon: GraduationCap },
+    { name: "Teachers", href: "/admin/dashboard/teachers", icon: Book },
     { name: "Divisions", href: "/admin/dashboard/divisions", icon: BookOpen },
     { name: "Result", href: "/admin/dashboard/result", icon: FileText },
   ];

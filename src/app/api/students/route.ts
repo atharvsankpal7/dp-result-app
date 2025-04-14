@@ -5,7 +5,10 @@ import Student from '@/lib/db/models/Student';
 export async function GET() {
   await connectDB();
   try {
-    const students = await Student.find({}).populate('division_id');
+    const students = await Student.find({}).populate({
+      path: 'division_id',
+      populate: { path: 'class_id' }
+    });
     return NextResponse.json(students);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch students' }, { status: 500 });
@@ -16,9 +19,35 @@ export async function POST(request: NextRequest) {
   await connectDB();
   try {
     const body = await request.json();
-    const student = await Student.create(body);
-    return NextResponse.json(student, { status: 201 });
+    
+    // Check if roll number already exists in the same division
+    const existingStudent = await Student.findOne({
+      roll_number: body.roll_number,
+      division_id: body.division_id
+    });
+    
+    if (existingStudent) {
+      return NextResponse.json(
+        { error: 'Student with this roll number already exists in this division' },
+        { status: 400 }
+      );
+    }
+
+    const student = await Student.create({
+      name: body.name,
+      mother_name: body.mother_name,
+      roll_number: body.roll_number,
+      division_id: body.division_id
+    });
+
+    const populatedStudent = await student.populate({
+      path: 'division_id',
+      populate: { path: 'class_id' }
+    });
+
+    return NextResponse.json(populatedStudent, { status: 201 });
   } catch (error) {
+    console.error('Error creating student:', error);
     return NextResponse.json({ error: 'Failed to create student' }, { status: 500 });
   }
 }

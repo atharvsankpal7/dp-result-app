@@ -20,6 +20,16 @@ export const api = {
     return res.json();
   },
 
+  async updateClass(id: string, data: { name: string }) {
+    const res = await fetch(`${BASE_URL}/classes/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to update class');
+    return res.json();
+  },
+
   async deleteClass(id: string) {
     const res = await fetch(`${BASE_URL}/classes/${id}`, {
       method: 'DELETE',
@@ -29,6 +39,12 @@ export const api = {
   },
 
   // Divisions
+  async getDivision(id: string) {
+    const res = await fetch(`${BASE_URL}/divisions/${id}`);
+    if (!res.ok) throw new Error('Failed to fetch division');
+    return res.json();
+  },
+
   async createDivision(data: { name: string; class_id: string }) {
     const res = await fetch(`${BASE_URL}/divisions`, {
       method: 'POST',
@@ -36,6 +52,16 @@ export const api = {
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error('Failed to create division');
+    return res.json();
+  },
+
+  async updateDivision(id: string, data: { name?: string; subjects?: string[] }) {
+    const res = await fetch(`${BASE_URL}/divisions/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to update division');
     return res.json();
   },
 
@@ -47,10 +73,74 @@ export const api = {
     return res.json();
   },
 
+  async assignSubjectsToDivision(divisionId: string, subjects: string[]) {
+    const res = await fetch(`${BASE_URL}/divisions/${divisionId}/subjects`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subjects }),
+    });
+    if (!res.ok) throw new Error('Failed to assign subjects');
+    return res.json();
+  },
+
+  async removeSubjectFromDivision(divisionId: string, subjectId: string) {
+    const res = await fetch(`${BASE_URL}/divisions/${divisionId}/subjects`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subjectId }),
+    });
+    if (!res.ok) throw new Error('Failed to remove subject');
+    return res.json();
+  },
+
   // Students
   async getStudents() {
     const res = await fetch(`${BASE_URL}/students`);
     if (!res.ok) throw new Error('Failed to fetch students');
+    return res.json();
+  },
+
+  async getStudent(id: string) {
+    const res = await fetch(`${BASE_URL}/students/${id}`);
+    if (!res.ok) throw new Error('Failed to fetch student');
+    return res.json();
+  },
+
+  async createStudent(data: {
+    name: string;
+    mother_name: string;
+    roll_number: string;
+    division_id: string;
+  }) {
+    const res = await fetch(`${BASE_URL}/students`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to create student');
+    return res.json();
+  },
+
+  async updateStudent(id: string, data: {
+    name?: string;
+    mother_name?: string;
+    roll_number?: string;
+    division_id?: string;
+  }) {
+    const res = await fetch(`${BASE_URL}/students/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to update student');
+    return res.json();
+  },
+
+  async deleteStudent(id: string) {
+    const res = await fetch(`${BASE_URL}/students/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete student');
     return res.json();
   },
 
@@ -63,6 +153,73 @@ export const api = {
       body: formData,
     });
     if (!res.ok) throw new Error('Failed to upload students');
+    return res.json();
+  },
+
+  // Teachers
+  async getTeachers() {
+    const res = await fetch(`${BASE_URL}/teachers`);
+    if (!res.ok) throw new Error('Failed to fetch teachers');
+    return res.json();
+  },
+
+  async getTeacher(id: string) {
+    const res = await fetch(`${BASE_URL}/teachers/${id}`);
+    if (!res.ok) throw new Error('Failed to fetch teacher');
+    return res.json();
+  },
+
+  async createTeacher(data: { name: string; email: string }) {
+    const res = await fetch(`${BASE_URL}/teachers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to create teacher');
+    return res.json();
+  },
+
+  async updateTeacher(id: string, data: {
+    name?: string;
+    email?: string;
+    assigned_subjects?: Array<{ subject_id: string; division_id: string }>;
+  }) {
+    const res = await fetch(`${BASE_URL}/teachers/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to update teacher');
+    return res.json();
+  },
+
+  async deleteTeacher(id: string) {
+    const res = await fetch(`${BASE_URL}/teachers/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete teacher');
+    return res.json();
+  },
+
+  async uploadTeachers(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const res = await fetch(`${BASE_URL}/teachers/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+    if (!res.ok) throw new Error('Failed to upload teachers');
+    return res.json();
+  },
+
+  async assignSubjectsToTeacher(teacherId: string, assignments: Array<{ subject_id: string; division_id: string }>) {
+    const res = await fetch(`${BASE_URL}/teachers/${teacherId}/assign-subjects`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ assignments }),
+    });
+    if (!res.ok) throw new Error('Failed to assign subjects');
     return res.json();
   },
 
