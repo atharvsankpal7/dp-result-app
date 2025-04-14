@@ -4,7 +4,7 @@ import { jwtVerify } from "jose";
 
 export async function middleware(request: NextRequest) {
   // Skip middleware for public routes
-  if (request.nextUrl.pathname.startsWith("/student/result")) {
+  if (request?.nextUrl?.pathname?.startsWith("/student/result")) {
     return NextResponse.next();
   }
 
@@ -12,13 +12,13 @@ export async function middleware(request: NextRequest) {
 
   // If there's no token and the user is trying to access a protected route
 
-  if (!token && !request.nextUrl.pathname.endsWith("/login")) {
+  if (!token && !request?.nextUrl.pathname.endsWith("/login")) {
     console.log("No token, redirecting to login");
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
   // If there's a token and the user is trying to access the login page
-  if (token && request.nextUrl.pathname.startsWith("/login")) {
+  if (token && request?.nextUrl?.pathname?.startsWith("/login")) {
     console.log("Token found, redirecting to home");
     return NextResponse.redirect(new URL("/", request.url));
   }
@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
       if (!payload.role) {
         return NextResponse.redirect(new URL("/login", request.url));
       }
-      if (request.nextUrl.pathname === "/") {
+      if (request?.nextUrl.pathname === "/") {
         return NextResponse.redirect(
           new URL(`${payload.role}/dashboard`, request.url)
         );
