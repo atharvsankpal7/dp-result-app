@@ -1,11 +1,10 @@
-import Staff from '@/lib/db/model/staff';
+import Staff from './model/staff';
 import connectDB from './connect';
 
 export const seedAdmin = async () => {
   try {
     await connectDB();
-    console.log('Connected to MongoDB');
-
+    
     // Check if admin already exists
     const existingAdmin = await Staff.findOne({ email: 'admin@example.com' });
     if (existingAdmin) {
@@ -16,14 +15,13 @@ export const seedAdmin = async () => {
     // Create admin user
     const admin = await Staff.create({
       email: 'admin@example.com',
-      password: 'admin123', // This will be hashed automatically by the pre-save hook
+      password: 'admin123',
       role: 'admin',
+      name: 'Admin User'
     });
 
-    console.log('Admin user created successfully:', admin);
+    console.log('Admin user created successfully');
   } catch (error) {
     console.error('Error seeding admin:', error);
   }
 };
-
-seedAdmin(); 

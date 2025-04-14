@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,7 +10,6 @@ import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import { seedAdmin } from '@/lib/db/seedAdmin'
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -39,9 +38,9 @@ export default function LoginPage() {
         },
         body: JSON.stringify(values),
       })
-      const role = await response.json()
-      console.log(role)
+      
       if (response.ok) {
+        const data = await response.json()
         router.push('/')
       } else {
         const data = await response.text()
@@ -51,7 +50,14 @@ export default function LoginPage() {
       setError('An error occurred during login')
     }
   }
-  seedAdmin()
+
+  useEffect(() => {
+    // Call the API endpoint to seed the admin user
+    fetch('/api/seed-admin', {
+      method: 'POST',
+    }).catch(console.error)
+  }, [])
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/50">
       <Card className="max-w-md w-full">

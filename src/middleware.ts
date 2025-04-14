@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
     try {
       const secret = new TextEncoder().encode(process.env.JWT_SECRET);
       const { payload } = await jwtVerify(token, secret);
-
+      console.log(payload)
       // Redirect based on role
       if (payload.role === "admin") {
         return NextResponse.redirect(new URL("/admin/dashboard", request.url));

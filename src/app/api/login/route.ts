@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   await connectDB();
   const { email, password } = await req.json();
   console.log(email, password);
-  const staff = await Staff.findOne({ email }).select("-password");
+  const staff = await Staff.findOne({ email });
   if (!staff) {
     return new Response("Invalid email or password", { status: 401 });
   }
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     return new Response("Invalid email or password", { status: 401 });
   }
 
-  const token = jwt.sign({ id: staff._id }, process.env.JWT_SECRET!, {
+  const token = jwt.sign({ id: staff._id, role : staff.role }, process.env.JWT_SECRET!, {
     expiresIn: "1d",
   });
 

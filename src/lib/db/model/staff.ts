@@ -1,35 +1,45 @@
-import mongoose, { CallbackError } from "mongoose";
+import mongoose, { CallbackError, Model } from "mongoose";
 import bcrypt from "bcryptjs";
 
-const StaffSchema = new mongoose.Schema({
+interface IStaff {
+  email: string;
+  password: string;
+  role: "admin" | "teacher";
+  name: string;
+  comparePassword(candidatePassword: string): Promise<boolean>;
+}
+
+interface StaffModel extends Model<IStaff> {
+  comparePassword(candidatePassword: string): Promise<boolean>;
+}
+
+const StaffSchema = new mongoose.Schema<IStaff>({
   email: { type: String, required: true, unique: true, index: true },
   password: { type: String, required: true },
   role: { type: String, required: true, enum: ["admin", "teacher"] },
-  name: { type: String, required: true }, // Missing name field that's used in seedAdmin.ts
+  name: { type: String, required: true },
 });
 
-// hash the password before saving to the database
+// Hash the password before saving to the database
 StaffSchema.pre("save", async function (next) {
-  const staff = this;
-
-  if (!staff.isModified("password")) {
+  if (!this.isModified("password")) {
     return next();
   }
 
   try {
-    const hash = await bcrypt.hash(staff.password, 10);
-    staff.password = hash;
+    const hash = await bcrypt.hash(this.password, 10);
+    this.password = hash;
     next();
   } catch (err: CallbackError | any) {
     next(err);
   }
 });
 
-StaffSchema.methods.comparePassword = async function (this, candidatePassword: string) {
-  
-  return await bcrypt.compare(candidatePassword, this.password);
+StaffSchema.methods.comparePassword = async function(this: IStaff, candidatePassword: string) {
+  console.log(this);
+  return bcrypt.compare(candidatePassword, this.password);
 };
-
-const Staff = mongoose.models.Staff || mongoose.model("Staff", StaffSchema);
+// Check if the model exists before creating a new one
+const Staff = (mongoose.models.Staff as StaffModel) || mongoose.model<IStaff, StaffModel>("Staff", StaffSchema);
 
 export default Staff;
