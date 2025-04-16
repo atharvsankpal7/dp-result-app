@@ -1,17 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/connect';
-import Teacher from '@/lib/db/models/Teacher';
+import Teacher from '@/lib/db/models/staff';
 import bcrypt from 'bcryptjs';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   await connectDB();
   try {
     const teacher = await Teacher.findById(params.id)
-      .populate('assigned_subjects.subject_id')
-      .populate({
-        path: 'assigned_subjects.division_id',
-        populate: { path: 'class_id' }
-      });
+     
     
     if (!teacher) {
       return NextResponse.json({ error: 'Teacher not found' }, { status: 404 });

@@ -240,7 +240,7 @@ export default function TeachersPage() {
                 <tr>
                   <th className="py-3 px-4 text-left">Name</th>
                   <th className="py-3 px-4 text-left">Email</th>
-                  <th className="py-3 px-4 text-left">Assigned Subjects</th>
+                  {/* <th className="py-3 px-4 text-left">Assigned Subjects</th> */}
                   <th className="py-3 px-4 text-left">Actions</th>
                 </tr>
               </thead>
@@ -249,13 +249,7 @@ export default function TeachersPage() {
                   <tr key={teacher._id} className="border-t">
                     <td className="py-3 px-4">{teacher.name}</td>
                     <td className="py-3 px-4">{teacher.email}</td>
-                    <td className="py-3 px-4">
-                      {teacher.assigned_subjects.map(assignment => (
-                        <div key={`${assignment.subject_id._id}-${assignment.division_id._id}`}>
-                          {assignment.subject_id.name} ({assignment.division_id.class_id.name} - {assignment.division_id.name})
-                        </div>
-                      ))}
-                    </td>
+                    
                     <td className="py-3 px-4">
                       <Button
                         variant="outline"

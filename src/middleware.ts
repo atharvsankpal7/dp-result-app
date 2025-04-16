@@ -4,7 +4,7 @@ import { jwtVerify } from "jose";
 
 export async function middleware(request: NextRequest) {
   // Skip middleware for public routes
-  if (request?.nextUrl?.pathname?.startsWith("/student/result") || request?.nextUrl?.pathname === "/") {
+  if (request?.nextUrl?.pathname?.startsWith("/student/result")) {
     return NextResponse.next();
   }
 
@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
     console.log("Token found, redirecting to home");
     return NextResponse.redirect(new URL("/", request.url));
   }
-
+  
   // If there's a token, verify it
   if (token) {
     try {

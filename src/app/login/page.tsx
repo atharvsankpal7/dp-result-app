@@ -51,13 +51,6 @@ export default function LoginPage() {
     }
   }
 
-  useEffect(() => {
-    // Call the API endpoint to seed the admin user
-    fetch('/api/seed-admin', {
-      method: 'POST',
-    }).catch(console.error)
-  }, [])
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/50">
       <Card className="max-w-md w-full">

@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/connect';
-import Teacher from '@/lib/db/models/Teacher';
+import Teacher from '@/lib/db/models/staff';
 
 export async function GET() {
   await connectDB();
   try {
     const teachers = await Teacher.find({})
-      .populate('assigned_subjects.subject_id')
-      .populate({
-        path: 'assigned_subjects.division_id',
-        populate: { path: 'class_id' }
-      });
+      
     return NextResponse.json(teachers);
   } catch (error) {
+    console.error('Failed to fetch teachers:', error);
     return NextResponse.json({ error: 'Failed to fetch teachers' }, { status: 500 });
   }
 }
@@ -35,7 +32,7 @@ export async function POST(request: NextRequest) {
       name: body.name,
       email: body.email,
       password: body.password,
-      assigned_subjects: []
+      role: 'teacher',
     });
 
     // Don't send password in response

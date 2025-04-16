@@ -269,6 +269,38 @@ export const api = {
     return res.json();
   },
 
+  // Teacher specific methods
+  async getAssignedSubjects(teacherId: string) {
+    const res = await fetch(`${BASE_URL}/teachers/${teacherId}/assigned-subjects`);
+    if (!res.ok) throw new Error('Failed to fetch assigned subjects');
+    return res.json();
+  },
+
+  async uploadResults(file: File, divisionId: string, subjectId: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('divisionId', divisionId);
+    formData.append('subjectId', subjectId);
+
+    const res = await fetch(`${BASE_URL}/results/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.error || 'Failed to upload results');
+    }
+
+    return res.json();
+  },
+
+  async getTeacherDashboardStats() {
+    const res = await fetch(`${BASE_URL}/teachers/dashboard-stats`);
+    if (!res.ok) throw new Error('Failed to fetch dashboard stats');
+    return res.json();
+  },
+
   // Excel Helper
   async parseExcelFile(file: File): Promise<any[]> {
     return new Promise((resolve, reject) => {

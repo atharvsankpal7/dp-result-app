@@ -1,0 +1,122 @@
+import { NextRequest, NextResponse } from 'next/server';
+import * as XLSX from 'xlsx';
+import connectDB from '@/lib/db/connect';
+import Result from '@/lib/db/models/Result';
+import Student from '@/lib/db/models/Student';
+import { verifyAuth } from '@/lib/auth';
+
+// Validate result data
+function validateResult(data: any) {
+  const requiredFields = ['roll_number', 'ut1', 'ut2', 'mid_term', 'annual'];
+  const missingFields = requiredFields.filter(field => !data[field]);
+  
+  if (missingFields.length > 0) {
+    return {
+      valid: false,
+      error: `Missing required fields: ${missingFields.join(', ')}`
+    };
+  }
+
+  // Validate marks ranges
+  if (data.ut1 < 0 || data.ut1 > 25) return { valid: false, error: 'UT1 marks must be between 0 and 25' };
+  if (data.ut2 < 0 || data.ut2 > 25) return { valid: false, error: 'UT2 marks must be between 0 and 25' };
+  if (data.mid_term < 0 || data.mid_term > 50) return { valid: false, error: 'Mid-term marks must be between 0 and 50' };
+  if (data.annual < 0 || data.annual > 100) return { valid: false, error: 'Annual marks must be between 0 and 100' };
+
+  return { valid: true };
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    await connectDB();
+
+    // Verify teacher authentication
+    const auth = await verifyAuth(request);
+    if (!auth.success || auth.user.role !== 'teacher') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const formData = await request.formData();
+    const file = formData.get('file') as File;
+    const divisionId = formData.get('divisionId') as string;
+    const subjectId = formData.get('subjectId') as string;
+
+    if (!file || !divisionId || !subjectId) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Verify teacher has access to this subject and division
+    const teacher = await Staff.findById(auth.user.id);
+    const hasAccess = teacher.assigned_subjects.some(
+      (assignment: any) => 
+        assignment.subject_id.toString() === subjectId &&
+        assignment.division_id.toString() === divisionId
+    );
+
+    if (!hasAccess) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // Read and parse Excel file
+    const buffer = await file.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: 'array' });
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    const data = XLSX.utils.sheet_to_json(worksheet);
+
+    const results = [];
+    const errors = [];
+
+    // Process each row
+    for (const row of data) {
+      // Validate row data
+      const validation = validateResult(row);
+      if (!validation.valid) {
+        errors.push(`Row ${data.indexOf(row) + 2}: ${validation.error}`);
+        continue;
+      }
+
+      // Find student by roll number in the division
+      const student = await Student.findOne({
+        roll_number: row.roll_number,
+        division_id: divisionId
+      });
+
+      if (!student) {
+        errors.push(`Row ${data.indexOf(row) + 2}: Student not found with roll number ${row.roll_number}`);
+        continue;
+      }
+
+      // Create or update result
+      const result = await Result.findOneAndUpdate(
+        {
+          student_id: student._id,
+          subject_id: subjectId
+        },
+        {
+          ut1: row.ut1,
+          ut2: row.ut2,
+          mid_term: row.mid_term,
+          annual: row.annual
+        },
+        { new: true, upsert: true }
+      );
+
+      results.push(result);
+    }
+
+    return NextResponse.json({
+      message: 'Results uploaded successfully',
+      results,
+      errors: errors.length > 0 ? errors : undefined
+    });
+  } catch (error) {
+    console.error('Error uploading results:', error);
+    return NextResponse.json(
+      { error: 'Failed to upload results' },
+      { status: 500 }
+    );
+  }
+}
