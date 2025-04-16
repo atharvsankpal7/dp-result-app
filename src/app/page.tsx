@@ -14,7 +14,7 @@ export default function Home() {
         </Link>
 
         <Link
-          href="/result"
+          href="student/result"
           className="bg-blue-500  text-white rounded-lg p-8 shadow-lg transition duration-500 ease-in-out transform hover:scale-105 flex flex-col items-center justify-center"
         >
 

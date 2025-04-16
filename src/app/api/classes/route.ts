@@ -5,9 +5,15 @@ import Class from '@/lib/db/models/Class';
 export async function GET() {
   await connectDB();
   try {
-    const classes = await Class.find({}).populate('divisions');
+      const classes = await Class.find({}).populate({
+        path: 'divisions',
+        populate: {
+          path: 'subjects'
+        }
+      }).lean();
     return NextResponse.json(classes);
   } catch (error) {
+    console.error('Error fetching classes:', error);
     return NextResponse.json({ error: 'Failed to fetch classes' }, { status: 500 });
   }
 }

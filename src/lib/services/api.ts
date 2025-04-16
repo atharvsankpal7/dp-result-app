@@ -94,6 +94,41 @@ export const api = {
     return res.json();
   },
 
+  // Subjects
+  async getSubjects() {
+    const res = await fetch(`${BASE_URL}/subjects`);
+    if (!res.ok) throw new Error('Failed to fetch subjects');
+    return res.json();
+  },
+
+  async createSubject(data: { name: string; course_code: string }) {
+    const res = await fetch(`${BASE_URL}/subjects`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to create subject');
+    return res.json();
+  },
+
+  async updateSubject(id: string, data: { name?: string; course_code?: string }) {
+    const res = await fetch(`${BASE_URL}/subjects/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to update subject');
+    return res.json();
+  },
+
+  async deleteSubject(id: string) {
+    const res = await fetch(`${BASE_URL}/subjects/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete subject');
+    return res.json();
+  },
+
   // Students
   async getStudents() {
     const res = await fetch(`${BASE_URL}/students`);

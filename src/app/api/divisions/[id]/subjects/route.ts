@@ -6,8 +6,9 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   await connectDB();
   try {
     const { subjects } = await request.json();
+    const {id} = await params
     const division = await Division.findByIdAndUpdate(
-      params.id,
+      id,
       { $set: { subjects } },
       { new: true }
     )

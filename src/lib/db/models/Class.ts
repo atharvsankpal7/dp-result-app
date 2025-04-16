@@ -8,7 +8,8 @@ const ClassSchema = new mongoose.Schema({
   },
   divisions: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Division'
+    ref: 'Division',
+    default: []
   }]
 }, {
   timestamps: true
