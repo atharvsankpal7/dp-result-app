@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import Subject from './Subject';
 
 const DivisionSchema = new mongoose.Schema({
   name: {
@@ -20,4 +21,4 @@ const DivisionSchema = new mongoose.Schema({
 });
 
 const Division = mongoose.models.Division || mongoose.model('Division', DivisionSchema);
-export default Division; 
+export default Division;

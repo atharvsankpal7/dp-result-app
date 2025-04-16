@@ -6,10 +6,6 @@ interface IStaff {
   password: string;
   role: "admin" | "teacher";
   name: string;
-  assigned_subjects: Array<{
-    subject_id: mongoose.Types.ObjectId;
-    division_id: mongoose.Types.ObjectId;
-  }>;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -22,7 +18,6 @@ const StaffSchema = new mongoose.Schema<IStaff>({
   password: { type: String, required: true },
   role: { type: String, required: true, enum: ["admin", "teacher"], default: "teacher" },
   name: { type: String, required: true },
-
 });
 
 // Hash the password before saving to the database

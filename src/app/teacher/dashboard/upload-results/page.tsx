@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,25 +9,9 @@ import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/
 import { Upload } from 'lucide-react';
 import { api } from '@/lib/services/api';
 import toast from 'react-hot-toast';
-import { useAuth } from '@/hooks/useAuth';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-
-interface AssignedSubject {
-  subject_id: {
-    _id: string;
-    name: string;
-  };
-  division_id: {
-    _id: string;
-    name: string;
-    class_id: {
-      _id: string;
-      name: string;
-    };
-  };
-}
 
 const singleResultSchema = z.object({
   roll_number: z.string().min(1, "Roll number is required"),
@@ -46,8 +30,7 @@ const singleResultSchema = z.object({
 });
 
 export default function UploadResults() {
-  const { user } = useAuth();
-  const [assignedSubjects, setAssignedSubjects] = useState<AssignedSubject[]>([]);
+  const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedDivision, setSelectedDivision] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('');
@@ -65,21 +48,17 @@ export default function UploadResults() {
     },
   });
 
-  useEffect(() => {
-    if (user?.id) {
-      fetchAssignedSubjects();
-    }
-  }, [user]);
+  React.useEffect(() => {
+    fetchClasses();
+  }, []);
 
-  const fetchAssignedSubjects = async () => {
+  const fetchClasses = async () => {
     try {
-      if (user?.id) {
-        const data = await api.getAssignedSubjects(user.id);
-        setAssignedSubjects(data);
-      }
+      const data = await api.getClasses();
+      setClasses(data);
     } catch (error) {
-      console.error('Failed to fetch assigned subjects:', error);
-      toast.error('Failed to fetch assigned subjects');
+      console.error('Failed to fetch classes:', error);
+      toast.error('Failed to fetch classes');
     }
   };
 
@@ -152,42 +131,6 @@ export default function UploadResults() {
     }
   };
 
-  const getClasses = () => {
-    const classes = new Map();
-    assignedSubjects.forEach(assignment => {
-      const classId = assignment.division_id.class_id._id;
-      classes.set(classId, {
-        id: classId,
-        name: assignment.division_id.class_id.name,
-      });
-    });
-    return Array.from(classes.values());
-  };
-
-  const getDivisions = () => {
-    const divisions = new Map();
-    assignedSubjects.forEach(assignment => {
-      if (assignment.division_id.class_id._id === selectedClass) {
-        divisions.set(assignment.division_id._id, {
-          id: assignment.division_id._id,
-          name: assignment.division_id.name,
-        });
-      }
-    });
-    return Array.from(divisions.values());
-  };
-
-  const getSubjects = () => {
-    return assignedSubjects
-      .filter(assignment => 
-        assignment.division_id._id === selectedDivision
-      )
-      .map(assignment => ({
-        id: assignment.subject_id._id,
-        name: assignment.subject_id.name,
-      }));
-  };
-
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Upload Results</h1>
@@ -206,8 +149,8 @@ export default function UploadResults() {
                       <SelectValue placeholder="Select Class" />
                     </SelectTrigger>
                     <SelectContent>
-                      {getClasses().map((class_) => (
-                        <SelectItem key={class_.id} value={class_.id}>
+                      {classes.map((class_: any) => (
+                        <SelectItem key={class_._id} value={class_._id}>
                           {class_.name}
                         </SelectItem>
                       ))}
@@ -223,11 +166,13 @@ export default function UploadResults() {
                       <SelectValue placeholder="Select Division" />
                     </SelectTrigger>
                     <SelectContent>
-                      {getDivisions().map((division) => (
-                        <SelectItem key={division.id} value={division.id}>
-                          {division.name}
-                        </SelectItem>
-                      ))}
+                      {selectedClass && classes
+                        .find((c: any) => c._id === selectedClass)
+                        ?.divisions.map((division: any) => (
+                          <SelectItem key={division._id} value={division._id}>
+                            {division.name}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
 
@@ -240,11 +185,15 @@ export default function UploadResults() {
                       <SelectValue placeholder="Select Subject" />
                     </SelectTrigger>
                     <SelectContent>
-                      {getSubjects().map((subject) => (
-                        <SelectItem key={subject.id} value={subject.id}>
-                          {subject.name}
-                        </SelectItem>
-                      ))}
+                      {selectedDivision && classes
+                        .find((c: any) => c._id === selectedClass)
+                        ?.divisions
+                        .find((d: any) => d._id === selectedDivision)
+                        ?.subjects.map((subject: any) => (
+                          <SelectItem key={subject._id} value={subject._id}>
+                            {subject.name}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -342,8 +291,8 @@ export default function UploadResults() {
                     <SelectValue placeholder="Select Class" />
                   </SelectTrigger>
                   <SelectContent>
-                    {getClasses().map((class_) => (
-                      <SelectItem key={class_.id} value={class_.id}>
+                    {classes.map((class_: any) => (
+                      <SelectItem key={class_._id} value={class_._id}>
                         {class_.name}
                       </SelectItem>
                     ))}
@@ -359,11 +308,13 @@ export default function UploadResults() {
                     <SelectValue placeholder="Select Division" />
                   </SelectTrigger>
                   <SelectContent>
-                    {getDivisions().map((division) => (
-                      <SelectItem key={division.id} value={division.id}>
-                        {division.name}
-                      </SelectItem>
-                    ))}
+                    {selectedClass && classes
+                      .find((c: any) => c._id === selectedClass)
+                      ?.divisions.map((division: any) => (
+                        <SelectItem key={division._id} value={division._id}>
+                          {division.name}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
 
@@ -376,11 +327,15 @@ export default function UploadResults() {
                     <SelectValue placeholder="Select Subject" />
                   </SelectTrigger>
                   <SelectContent>
-                    {getSubjects().map((subject) => (
-                      <SelectItem key={subject.id} value={subject.id}>
-                        {subject.name}
-                      </SelectItem>
-                    ))}
+                    {selectedDivision && classes
+                      .find((c: any) => c._id === selectedClass)
+                      ?.divisions
+                      .find((d: any) => d._id === selectedDivision)
+                      ?.subjects.map((subject: any) => (
+                        <SelectItem key={subject._id} value={subject._id}>
+                          {subject.name}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>

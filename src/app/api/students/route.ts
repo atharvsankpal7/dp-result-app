@@ -9,6 +9,7 @@ export async function GET() {
       path: 'division_id',
       populate: { path: 'class_id' }
     });
+    console.log("students", students);
     return NextResponse.json(students);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch students' }, { status: 500 });

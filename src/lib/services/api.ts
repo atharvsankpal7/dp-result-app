@@ -219,7 +219,6 @@ export const api = {
     name?: string;
     email?: string;
     password?: string;
-    assigned_subjects?: Array<{ subject_id: string; division_id: string }>;
   }) {
     const res = await fetch(`${BASE_URL}/teachers/${id}`, {
       method: 'PUT',
@@ -250,29 +249,12 @@ export const api = {
     return res.json();
   },
 
-  async assignSubjectsToTeacher(teacherId: string, assignments: Array<{ subject_id: string; division_id: string }>) {
-    const res = await fetch(`${BASE_URL}/teachers/${teacherId}/assign-subjects`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ assignments }),
-    });
-    if (!res.ok) throw new Error('Failed to assign subjects');
-    return res.json();
-  },
-
   // Results
   async getResults(classId: string, divisionId: string, subjectId: string) {
     const res = await fetch(
       `${BASE_URL}/results?class=${classId}&division=${divisionId}&subject=${subjectId}`
     );
     if (!res.ok) throw new Error('Failed to fetch results');
-    return res.json();
-  },
-
-  // Teacher specific methods
-  async getAssignedSubjects(teacherId: string) {
-    const res = await fetch(`${BASE_URL}/teachers/${teacherId}/assigned-subjects`);
-    if (!res.ok) throw new Error('Failed to fetch assigned subjects');
     return res.json();
   },
 

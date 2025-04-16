@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/connect';
 import Class from '@/lib/db/models/Class';
+import '@/lib/db/models/Division';
 
 export async function GET() {
   await connectDB();
@@ -10,7 +11,8 @@ export async function GET() {
         populate: {
           path: 'subjects'
         }
-      }).lean();
+
+      }).lean().exec() || [];
     return NextResponse.json(classes);
   } catch (error) {
     console.error('Error fetching classes:', error);

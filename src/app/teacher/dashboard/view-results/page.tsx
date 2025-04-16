@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { api } from '@/lib/services/api';
 
 export default function ViewResults() {
-  const [classes, setClasses] = useState([]);
+  const [classes, setClasses] = useState<any>([]);
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedDivision, setSelectedDivision] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('');
@@ -18,6 +18,7 @@ export default function ViewResults() {
 
   useEffect(() => {
     if (selectedClass && selectedDivision && selectedSubject) {
+      console.log('Fetching results...');
       fetchResults();
     }
   }, [selectedClass, selectedDivision, selectedSubject]);
@@ -34,6 +35,7 @@ export default function ViewResults() {
   const fetchResults = async () => {
     try {
       const data = await api.getResults(selectedClass, selectedDivision, selectedSubject);
+      console.log('Fetched results:', data);
       setResults(data);
     } catch (error) {
       console.error('Failed to fetch results:', error);

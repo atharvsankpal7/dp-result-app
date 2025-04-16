@@ -266,8 +266,8 @@ export default function StudentsPage() {
                     <td className="py-3 px-4">{student.roll_number}</td>
                     <td className="py-3 px-4">{student.name}</td>
                     <td className="py-3 px-4">{student.mother_name}</td>
-                    <td className="py-3 px-4">{student.division_id.class_id.name}</td>
-                    <td className="py-3 px-4">{student.division_id.name}</td>
+                    <td className="py-3 px-4">{student.division_id?.class_id.name}</td>
+                    <td className="py-3 px-4">{student.division_id?.name}</td>
                   </tr>
                 ))}
               </tbody>

@@ -13,8 +13,10 @@ export async function GET(request: NextRequest) {
     const subjectId = searchParams.get('subject');
 
     const results = await Result.find({
-      'student_id.division_id': divisionId,
-      subject_id: subjectId
+      subject_id: subjectId,
+      student_id: {
+        $in: await Student.find({ division_id: divisionId }).distinct('_id')
+      }
     }).populate('student_id').populate('subject_id');
 
     return NextResponse.json(results);
