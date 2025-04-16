@@ -18,7 +18,6 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       _id: teacher._id,
       name: teacher.name,
       email: teacher.email,
-      assigned_subjects: teacher.assigned_subjects
     };
 
     return NextResponse.json(teacherResponse);

@@ -135,7 +135,7 @@ export default function ClassesPage() {
                       <tr key={class_._id} className="border-t">
                         <td className="py-3 px-4">{class_.name}</td>
                         <td className="py-3 px-4">
-                          {class_.divisions.map((d) => d.name).join(", ")}
+                          {class_?.divisions?.map((d) => d.name).join(", ")}
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex gap-2">
@@ -214,7 +214,7 @@ export default function ClassesPage() {
                           <tr key={division._id} className="border-t">
                             <td className="py-3 px-4">{division.name}</td>
                             <td className="py-3 px-4">
-                              {division.subjects.map((subject, index) =>
+                              {division?.subjects?.map((subject, index) =>
                                 index === division.subjects.length - 1
                                   ? subject.name
                                   : subject.name + ", "

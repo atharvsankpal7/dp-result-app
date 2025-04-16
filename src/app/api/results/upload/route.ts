@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx';
 import connectDB from '@/lib/db/connect';
 import Result from '@/lib/db/models/Result';
 import Student from '@/lib/db/models/Student';
+import Staff from '@/lib/db/models/staff';
 import { verifyAuth } from '@/lib/auth';
 
 // Validate result data
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     // Verify teacher authentication
     const auth = await verifyAuth(request);
-    if (!auth.success || auth.user.role !== 'teacher') {
+    if (!auth.success || auth?.user?.role !== 'teacher') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -48,17 +49,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify teacher has access to this subject and division
-    const teacher = await Staff.findById(auth.user.id);
-    const hasAccess = teacher.assigned_subjects.some(
-      (assignment: any) => 
-        assignment.subject_id.toString() === subjectId &&
-        assignment.division_id.toString() === divisionId
-    );
+    
 
-    if (!hasAccess) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+   
 
     // Read and parse Excel file
     const buffer = await file.arrayBuffer();
@@ -89,6 +82,10 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
+      // Calculate total and determine remark
+      const total = (Number(row.ut1) + Number(row.ut2) + Number(row.mid_term) + Number(row.annual)) / 2;
+      const remark = total >= 35 ? 'Pass' : 'Fail';
+
       // Create or update result
       const result = await Result.findOneAndUpdate(
         {
@@ -99,7 +96,9 @@ export async function POST(request: NextRequest) {
           ut1: row.ut1,
           ut2: row.ut2,
           mid_term: row.mid_term,
-          annual: row.annual
+          annual: row.annual,
+          total,
+          remark
         },
         { new: true, upsert: true }
       );

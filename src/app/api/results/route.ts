@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/connect';
 import Result from '@/lib/db/models/Result';
+import Student from '@/lib/db/models/Student';
+import { verifyAuth } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   await connectDB();
@@ -24,10 +26,47 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   await connectDB();
   try {
+    const auth = await verifyAuth(request);
+    if (!auth.success || auth?.user?.role !== 'teacher') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
-    const result = await Result.create(body);
+    
+    // Find student by roll number and division
+    const student = await Student.findOne({
+      roll_number: body.roll_number,
+      division_id: body.division_id
+    });
+
+    if (!student) {
+      return NextResponse.json({ error: 'Student not found' }, { status: 404 });
+    }
+
+    // Calculate total and determine remark
+    const total = (Number(body.ut1) + Number(body.ut2) + Number(body.mid_term) + Number(body.annual)) / 2;
+    const remark = total >= 35 ? 'Pass' : 'Fail';
+
+    // Create or update result
+    const result = await Result.findOneAndUpdate(
+      {
+        student_id: student._id,
+        subject_id: body.subject_id
+      },
+      {
+        ut1: body.ut1,
+        ut2: body.ut2,
+        mid_term: body.mid_term,
+        annual: body.annual,
+        total,
+        remark
+      },
+      { new: true, upsert: true }
+    );
+
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
+    console.error('Error creating result:', error);
     return NextResponse.json({ error: 'Failed to create result' }, { status: 500 });
   }
 }
