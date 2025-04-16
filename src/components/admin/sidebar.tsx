@@ -29,6 +29,7 @@ const Sidebar = () => {
     { name: "Classes", href: "/admin/dashboard/classes", icon: GraduationCap },
     { name: "Teachers", href: "/admin/dashboard/teachers", icon: Book },
     { name: "Divisions", href: "/admin/dashboard/divisions", icon: BookOpen },
+    { name: "Subjects", href: "/admin/dashboard/subjects", icon: FileText },
     { name: "Result", href: "/admin/dashboard/result", icon: FileText },
   ];
 

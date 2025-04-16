@@ -70,7 +70,17 @@ export default function ClassesPage() {
       setLoading(false)
     }
   }
-
+  const handleDeleteClass = async (classId: string) => {
+    setLoading(true)
+    try {
+      await api.deleteClass(classId)
+      await fetchClasses()
+    } catch (error) {
+      console.error('Failed to delete class:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -117,7 +127,7 @@ export default function ClassesPage() {
                             <Button variant="outline" size="sm">
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button variant="destructive" size="sm">
+                            <Button variant="destructive" size="sm" onClick={() => handleDeleteClass(class_._id)} disabled={loading}>
                               <Trash className="h-4 w-4" />
                             </Button>
                           </div>
@@ -181,7 +191,7 @@ export default function ClassesPage() {
                         <tr key={division._id} className="border-t">
                           <td className="py-3 px-4">{division.name}</td>
                           <td className="py-3 px-4">
-                            {division.subjects.join(', ')}
+                            {division?.subjects?.join(', ')}
                           </td>
                           <td className="py-3 px-4">
                             <div className="flex gap-2">

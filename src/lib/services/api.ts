@@ -10,6 +10,7 @@ export const api = {
     return res.json();
   },
 
+  // single class operations
   async createClass(data: { name: string }) {
     const res = await fetch(`${BASE_URL}/classes`, {
       method: 'POST',
