@@ -4,7 +4,7 @@ import { jwtVerify } from "jose";
 
 export async function middleware(request: NextRequest) {
   // Skip middleware for public routes
-  if (request?.nextUrl?.pathname?.startsWith("/student/result")) {
+  if (request?.nextUrl?.pathname?.endsWith("/students/result")) {
     return NextResponse.next();
   }
 

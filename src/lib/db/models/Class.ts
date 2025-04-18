@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import './Division';
+import './Subject';
 
 const ClassSchema = new mongoose.Schema({
   name: {
