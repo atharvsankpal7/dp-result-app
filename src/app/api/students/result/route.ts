@@ -6,17 +6,31 @@ import Result from '@/lib/db/models/Result';
 export async function POST(request: NextRequest) {
   await connectDB();
   try {
-    const { roll_number, mother_name } = await request.json();
+    const { roll_number, mother_name, division_id, class_id } = await request.json();
 
-    // Find student by roll number and mother's name
+    // Find student by roll number, mother's name, division and class
     const student = await Student.findOne({
       roll_number,
-      mother_name: { $regex: new RegExp(`^${mother_name}$`, 'i') } // Case-insensitive match
-    }).populate('division_id');
+      mother_name: { $regex: new RegExp(`^${mother_name}$`, 'i') }, // Case-insensitive match
+      division_id
+    }).populate({
+      path: 'division_id',
+      populate: {
+        path: 'class_id'
+      }
+    });
 
     if (!student) {
       return NextResponse.json(
-        { error: 'Invalid roll number or mother\'s name' },
+        { error: 'Student not found. Please check your details.' },
+        { status: 401 }
+      );
+    }
+
+    // Verify if student belongs to the specified class
+    if (student.division_id.class_id._id.toString() !== class_id) {
+      return NextResponse.json(
+        { error: 'Invalid class selected for this student.' },
         { status: 401 }
       );
     }
@@ -28,6 +42,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       student_name: student.name,
+      class_name: student.division_id.class_id.name,
+      division_name: student.division_id.name,
       results: results.map(result => ({
         subject_id: {
           name: result.subject_id.name,
