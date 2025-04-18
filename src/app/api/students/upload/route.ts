@@ -8,9 +8,12 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const division_id = formData.get('division_id') as string;
     
-    if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+    if (!file || !division_id) {
+      return NextResponse.json({ 
+        error: !file ? 'No file uploaded' : 'Division ID is required' 
+      }, { status: 400 });
     }
 
     const buffer = await file.arrayBuffer();
@@ -20,10 +23,10 @@ export async function POST(request: NextRequest) {
 
     const students = await Promise.all(
       data.map(async (row: any) => {
-        // Check if student already exists
+        // Check if student already exists in this division
         const existingStudent = await Student.findOne({
           roll_number: row.roll_number,
-          division_id: row.division_id
+          division_id: division_id
         });
         
         if (existingStudent) {
@@ -34,7 +37,7 @@ export async function POST(request: NextRequest) {
           name: row.name,
           mother_name: row.mother_name,
           roll_number: row.roll_number,
-          division_id: row.division_id
+          division_id: division_id
         });
 
         return student.populate({

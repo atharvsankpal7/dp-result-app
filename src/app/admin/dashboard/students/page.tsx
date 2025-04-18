@@ -48,6 +48,8 @@ export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([])
   const [classes, setClasses] = useState<Class[]>([])
   const [selectedClass, setSelectedClass] = useState('')
+  const [selectedUploadClass, setSelectedUploadClass] = useState('')
+  const [selectedUploadDivision, setSelectedUploadDivision] = useState('')
   const [loading, setLoading] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -84,11 +86,25 @@ export default function StudentsPage() {
   }
 
   const handleFileUpload = async () => {
-    if (!file) return
+    if (!file || !selectedUploadDivision) return
     setLoading(true)
     try {
-      await api.uploadStudents(file)
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('division_id', selectedUploadDivision)
+
+      const response = await fetch('/api/students/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to upload students')
+      }
+
       setFile(null)
+      setSelectedUploadClass('')
+      setSelectedUploadDivision('')
       await fetchStudents()
     } catch (error) {
       console.error('Failed to upload students:', error)
@@ -221,6 +237,40 @@ export default function StudentsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Select value={selectedUploadClass} onValueChange={setSelectedUploadClass}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Class" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {classes.map((class_) => (
+                      <SelectItem key={class_._id} value={class_._id}>
+                        {class_.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select 
+                  value={selectedUploadDivision} 
+                  onValueChange={setSelectedUploadDivision}
+                  disabled={!selectedUploadClass}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Division" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {selectedUploadClass && classes
+                      .find(c => c._id === selectedUploadClass)
+                      ?.divisions.map((division) => (
+                        <SelectItem key={division._id} value={division._id}>
+                          {division.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="flex items-center gap-4">
                 <Input 
                   type="file" 
@@ -230,14 +280,14 @@ export default function StudentsPage() {
                 />
                 <Button 
                   onClick={handleFileUpload} 
-                  disabled={!file || loading}
+                  disabled={!file || !selectedUploadDivision || loading}
                 >
                   <Upload className="mr-2 h-4 w-4" />
                   {loading ? 'Uploading...' : 'Upload'}
                 </Button>
               </div>
               <div className="text-sm text-muted-foreground">
-                Upload an Excel file containing student details: Name, Mother's Name, Roll Number, Division ID
+                Upload an Excel file containing student details: Name, Mother's Name, Roll Number
               </div>
             </div>
           </CardContent>
