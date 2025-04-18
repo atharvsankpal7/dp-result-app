@@ -40,7 +40,6 @@ export async function POST(request: NextRequest) {
       _id: teacher._id,
       name: teacher.name,
       email: teacher.email,
-      assigned_subjects: teacher.assigned_subjects
     };
 
     return NextResponse.json(teacherResponse, { status: 201 });

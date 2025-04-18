@@ -3,7 +3,6 @@ import * as XLSX from 'xlsx';
 import connectDB from '@/lib/db/connect';
 import Result from '@/lib/db/models/Result';
 import Student from '@/lib/db/models/Student';
-import Staff from '@/lib/db/models/staff';
 import { verifyAuth } from '@/lib/auth';
 
 // Validate result data

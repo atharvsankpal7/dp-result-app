@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/connect';
-import Teacher from '@/lib/db/models/Teacher';
+import Teacher from '@/lib/db/models/staff';
 import * as XLSX from 'xlsx';
 
 export async function POST(request: NextRequest) {
@@ -29,14 +29,10 @@ export async function POST(request: NextRequest) {
         const teacher = await Teacher.create({
           name: row.name,
           email: row.email,
-          assigned_subjects: []
+          password: row.password,
         });
 
-        return teacher.populate('assigned_subjects.subject_id')
-          .populate({
-            path: 'assigned_subjects.division_id',
-            populate: { path: 'class_id' }
-          });
+        return teacher
       })
     );
 
