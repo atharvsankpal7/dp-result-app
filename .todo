@@ -1,0 +1,18 @@
+Now we need to do some refactoring, firstly we should be having ability to see the whole divisions result at once where we will have ability to see the whole divisons result at once which should have columns as the roll no, name, subjects and then various exams in and in rows we should have the roll no and like this
+for class 11, division 3
+
+roll no, subject, ut1, ut2, mid-term, annual, total, remark
+1, maths, 22, 24,48,70,xx,xx
+  physics, xx, xx, xx, xx, xx
+.....
+......
+2, maths, 21,25,39, 98, xx, xx
+and make sure that excel sheet is downloadable
+---------
+we have to give each of the student a roll number which will be unique and not assinged to the given division, then the student can be shifted to other divisions at any given time and on that time the subjects that were introduced to him after shifting the division will be given marks and also make sure that we are able to edit the student information all together like name, mother's name etc, and after that we should have optional subjects to the given divisions that mean the students have option to choose from 2 of the subjects they can choose either of them i.e. for example division can have physics, chemistry and maths will be  compulsory subjects and then we can also have 2 subject like bio/electronics-1 and geography/electronics-2 to be selected by the students, so he can choose either of the subjects from given options, everything of this will be handled by the admin
+--------------
+so admin should have ability to add compulsory and optional subjects and then as well when adding a optional subject we should add 2 of these to indicate that a student can choose from either of these and and this should be done when creating the student, for individual  student addition we should have the to switch and select between either of the all optional subjects.
+----------------
+and for the students page we should have division wise filtering and there we should have ability to edit the student button we should select the roll number of the student and there we can edit the division of the student and then when we are saving that we should get to select the optional subjects.
+-----------
+and in marks section we should have annual divided into 2 part theory and practicle but make sure that we have only the sum such that it doesn't exceed 100

@@ -14,7 +14,9 @@ const StudentSchema = new mongoose.Schema({
   roll_number: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    index: true,
+    unique: true
   },
   division_id: {
     type: mongoose.Schema.Types.ObjectId,
