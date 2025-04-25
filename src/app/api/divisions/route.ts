@@ -11,7 +11,7 @@ export async function GET() {
       .populate('subjects');
     return NextResponse.json(divisions);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch divisions' }, { status: 500 });
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
 
@@ -26,6 +26,6 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(division, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create division' }, { status: 500 });
+    return NextResponse.json({ error}, { status: 500 });
   }
 }

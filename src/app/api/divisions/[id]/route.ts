@@ -23,7 +23,7 @@ export async function GET(
     return NextResponse.json(division);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch division" },
+      { error },
       { status: 500 }
     );
   }
@@ -53,7 +53,7 @@ export async function PUT(
     return NextResponse.json(division);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to update division" },
+      { error },
       { status: 500 }
     );
   }
@@ -84,7 +84,7 @@ export async function DELETE(
     return NextResponse.json({ message: "Division deleted successfully" });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to delete division" },
+      { error},
       { status: 500 }
     );
   }

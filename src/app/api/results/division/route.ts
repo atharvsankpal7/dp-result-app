@@ -37,7 +37,8 @@ export async function GET(request: NextRequest) {
             ut1: result.ut1,
             ut2: result.ut2,
             terminal: result.terminal,
-            annual: result.annual,
+            annual_theory: result.annual_theory,
+            annual_practical: result.annual_practical,
             total: result.total,
             remark: result.remark
           }))

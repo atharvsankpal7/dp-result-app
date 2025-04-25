@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/connect';
 import Staff from '@/lib/db/models/staff';
 import Result from '@/lib/db/models/Result';
-import Student from '@/lib/db/models/Student';
 import { verifyAuth } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
@@ -19,14 +18,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Teacher not found' }, { status: 404 });
     }
 
-    // Get all division IDs assigned to the teacher
-    const divisionIds = teacher.assigned_subjects.map(assignment => assignment.division_id);
-    const subjectIds = teacher.assigned_subjects.map(assignment => assignment.subject_id);
-
-    // Count total students in assigned divisions
-    const totalStudents = await Student.countDocuments({
-      division_id: { $in: divisionIds }
-    });
+   
 
     // Count total results uploaded by the teacher
     const totalResults = await Result.countDocuments({

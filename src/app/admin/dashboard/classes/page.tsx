@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Edit, Trash } from "lucide-react";
+import {  Edit, Trash } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -13,7 +13,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { api } from "@/lib/services/api";
-import { set } from "mongoose";
 
 interface Class {
   _id: string;

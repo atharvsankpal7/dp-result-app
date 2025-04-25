@@ -284,6 +284,7 @@ export const api = {
   },
 
   // Excel Helper
+  // @typescript-eslint/no-explicit-any
   async parseExcelFile(file: File): Promise<any[]> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -26,7 +25,8 @@ interface Result {
     ut1: number;
     ut2: number;
     terminal: number;
-    annual: number;
+    annual_practical: number;
+    annual_theory: number;
     total: number;
     remark: "Pass" | "Fail";
   }[];
@@ -34,7 +34,7 @@ interface Result {
 
 export default function ResultPage() {
   const [classes, setClasses] = useState<any[]>([]);
-  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedClass, setSelectedClass] = useState<any[]>("");
   const [selectedDivision, setSelectedDivision] = useState("");
   const [results, setResults] = useState<Result[]>([]);
 
@@ -131,10 +131,18 @@ export default function ResultPage() {
                   <th className="py-3 px-4 text-left">Subject</th>
                   <th className="py-3 px-4 text-left">UT-1</th>
                   <th className="py-3 px-4 text-left">UT-2</th>
-                  <th className="py-3 px-4 text-left">terminal</th>
-                  <th className="py-3 px-4 text-left">Annual</th>
+                  <th className="py-3 px-4 text-left">Terminal</th>
+                  <th className="py-3 px-4 text-center" colSpan={2}>
+                    Annual
+                  </th>
                   <th className="py-3 px-4 text-left">Total</th>
                   <th className="py-3 px-4 text-left">Remark</th>
+                </tr>
+                <tr>
+                  <th className="py-1" colSpan={6}></th>
+                  <th className="py-1 px-4">Theory</th>
+                  <th className="py-1 px-4">Practical</th>
+                  <th className="py-1" colSpan={2}></th>
                 </tr>
               </thead>
               <tbody>
@@ -166,7 +174,12 @@ export default function ResultPage() {
                       <td className="py-3 px-4">{subjectResult.ut1}</td>
                       <td className="py-3 px-4">{subjectResult.ut2}</td>
                       <td className="py-3 px-4">{subjectResult.terminal}</td>
-                      <td className="py-3 px-4">{subjectResult.annual}</td>
+                      <td className="py-3 px-4">
+                        {subjectResult.annual_theory}
+                      </td>
+                      <td className="py-3 px-4">
+                        {subjectResult.annual_practical}
+                      </td>
                       <td className="py-3 px-4">{subjectResult.total}</td>
                       <td className="py-3 px-4">
                         <span

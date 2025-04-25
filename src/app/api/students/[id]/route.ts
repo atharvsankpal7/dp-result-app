@@ -16,7 +16,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
     return NextResponse.json(student);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch student' }, { status: 500 });
+    return NextResponse.json({error}, { status: 500 });
   }
 }
 

@@ -13,7 +13,7 @@ export const seedAdmin = async () => {
     }
 
     // Create admin user
-    const admin = await Staff.create({
+    await Staff.create({
       email: 'admin@example.com',
       password: 'admin123',
       role: 'admin',

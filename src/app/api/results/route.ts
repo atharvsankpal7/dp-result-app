@@ -8,7 +8,6 @@ export async function GET(request: NextRequest) {
   await connectDB();
   try {
     const { searchParams } = new URL(request.url);
-    const classId = searchParams.get('class');
     const divisionId = searchParams.get('division');
     const subjectId = searchParams.get('subject');
 
@@ -21,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(results);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch results' }, { status: 500 });
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
 
@@ -46,7 +45,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate total and determine remark
-    const total = (Number(body.ut1) + Number(body.ut2) + Number(body.terminal) + Number(body.annual)) / 2;
+    const total = (Number(body.ut1) + Number(body.ut2) + Number(body.terminal) + Number(body.annual_theory) + Number(body.annual_practical)) / 2;
     const remark = total >= 35 ? 'Pass' : 'Fail';
 
     // Create or update result
@@ -59,7 +58,8 @@ export async function POST(request: NextRequest) {
         ut1: body.ut1,
         ut2: body.ut2,
         terminal: body.terminal,
-        annual: body.annual,
+        annual_theory: body.annual_theory,
+        annual_practical: body.annual_practical,
         total,
         remark
       },

@@ -9,7 +9,6 @@ import { Edit, Trash } from 'lucide-react'
 import { api } from '@/lib/services/api'
 import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { set } from 'mongoose'
 
 interface Division {
   _id: string;
@@ -32,6 +31,7 @@ interface Subject {
 }
 
 export default function DivisionsPage() {
+  // @typescript-eslint/no-explicit-any
   const [classes, setClasses] = useState<any[]>([])
   const [subjects, setSubjects] = useState<Subject[]>([])
   const [selectedClass, setSelectedClass] = useState('')

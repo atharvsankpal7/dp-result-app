@@ -27,6 +27,6 @@ export async function POST(request: NextRequest) {
     const class_ = await Class.create(body);
     return NextResponse.json(class_, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create class' }, { status: 500 });
+    return NextResponse.json({ error }, { status: 500 });
   }
 }

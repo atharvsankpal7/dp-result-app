@@ -21,7 +21,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
     return NextResponse.json(division);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to assign subjects' }, { status: 500 });
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
 
@@ -43,6 +43,6 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     return NextResponse.json(division);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to remove subject' }, { status: 500 });
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
