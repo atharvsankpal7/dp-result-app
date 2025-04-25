@@ -15,36 +15,33 @@ import * as z from "zod"
 
 const singleResultSchema = z.object({
   roll_number: z.string().min(1, "Roll number is required"),
-  ut1: z.string().transform(Number).pipe(
-    z.number().min(0).max(25, "UT1 marks must be between 0 and 25")
-  ),
-  ut2: z.string().transform(Number).pipe(
-    z.number().min(0).max(25, "UT2 marks must be between 0 and 25")
-  ),
-  terminal: z.string().transform(Number).pipe(
-    z.number().min(0).max(50, "terminal marks must be between 0 and 50")
-  ),
-  annual: z.string().transform(Number).pipe(
-    z.number().min(0).max(100, "Annual marks must be between 0 and 100")
-  ),
+  ut1: z.coerce.number().min(0).max(25, "UT1 marks must be between 0 and 25"),
+  ut2: z.coerce.number().min(0).max(25, "UT2 marks must be between 0 and 25"),
+  terminal: z.coerce.number().min(0).max(50, "terminal marks must be between 0 and 50"),
+  annual_theory: z.coerce.number().min(0).max(70, "Annual theory marks must be between 0 and 70"),
+  annual_practical: z.coerce.number().min(0).max(30, "Annual practical marks must be between 0 and 30"),
 });
 
+// Define the type from the schema
+type ResultFormValues = z.infer<typeof singleResultSchema>;
+
 export default function UploadResults() {
-  const [classes, setClasses] = useState([]);
+  const [classes, setClasses] = useState<any[]>([]);
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedDivision, setSelectedDivision] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof singleResultSchema>>({
+  const form = useForm<ResultFormValues>({
     resolver: zodResolver(singleResultSchema),
     defaultValues: {
       roll_number: "",
-      ut1: "",
-      ut2: "",
-      terminal: "",
-      annual: "",
+      ut1: 0,
+      ut2: 0,
+      terminal: 0,
+      annual_theory: 0,
+      annual_practical: 0,
     },
   });
 
@@ -97,7 +94,7 @@ export default function UploadResults() {
     }
   };
 
-  const onSubmitSingleResult = async (values: z.infer<typeof singleResultSchema>) => {
+  const onSubmitSingleResult = async (values: ResultFormValues) => {
     if (!selectedDivision || !selectedSubject) {
       toast.error('Please select division and subject');
       return;
@@ -239,13 +236,26 @@ export default function UploadResults() {
                   />
                 </div>
 
+                <FormField
+                  control={form.control}
+                  name="terminal"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Terminal Marks (out of 50)</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="terminal"
+                    name="annual_theory"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>terminal Marks (out of 50)</FormLabel>
+                        <FormLabel>Annual Theory (out of 70)</FormLabel>
                         <FormControl>
                           <Input type="number" {...field} />
                         </FormControl>
@@ -255,10 +265,10 @@ export default function UploadResults() {
 
                   <FormField
                     control={form.control}
-                    name="annual"
+                    name="annual_practical"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Annual Marks (out of 100)</FormLabel>
+                        <FormLabel>Annual Practical (out of 30)</FormLabel>
                         <FormControl>
                           <Input type="number" {...field} />
                         </FormControl>
@@ -363,7 +373,8 @@ export default function UploadResults() {
                   <li>ut1 (Unit Test 1 marks, max 25)</li>
                   <li>ut2 (Unit Test 2 marks, max 25)</li>
                   <li>terminal (Mid Term marks, max 50)</li>
-                  <li>annual (Annual Exam marks, max 100)</li>
+                  <li>annual_theory (Annual Theory marks)</li>
+                  <li>annual_practical (Annual Practical marks)</li>
                 </ul>
               </div>
             </div>

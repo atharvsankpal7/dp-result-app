@@ -34,7 +34,7 @@ interface Result {
 
 export default function ResultPage() {
   const [classes, setClasses] = useState<any[]>([]);
-  const [selectedClass, setSelectedClass] = useState<any[]>("");
+  const [selectedClass, setSelectedClass] = useState<string>("");
   const [selectedDivision, setSelectedDivision] = useState("");
   const [results, setResults] = useState<Result[]>([]);
 

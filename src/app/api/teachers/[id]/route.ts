@@ -3,7 +3,7 @@ import connectDB from '@/lib/db/connect';
 import bcrypt from 'bcryptjs';
 import Staff from '@/lib/db/models/staff';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
   try {
     const {id} = await params;
@@ -27,9 +27,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
   try {
+    const {id} = await params;
     const body = await request.json();
     const updateData = { ...body };
 
@@ -41,7 +42,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       delete updateData.password; // Don't update password if not provided
     }
 
-    const teacher = await Staff.findByIdAndUpdate(params.id, updateData, {
+    const teacher = await Staff.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true
     })
@@ -68,10 +69,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
   try {
-    const teacher = await Staff.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const teacher = await Staff.findByIdAndDelete(id);
     if (!teacher) {
       return NextResponse.json({ error: 'Teacher not found' }, { status: 404 });
     }

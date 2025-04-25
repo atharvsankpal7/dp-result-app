@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/connect';
 import Student from '@/lib/db/models/Student';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
   try {
-    const student = await Student.findById(params.id)
+    const { id } = await params;
+    const student = await Student.findById(id)
       .populate({
         path: 'division_id',
         populate: { path: 'class_id' }
@@ -20,11 +21,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
   try {
     const body = await request.json();
-    const student = await Student.findByIdAndUpdate(params.id, body, {
+    const { id } = await params;
+    const student = await Student.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true
     }).populate({
@@ -41,10 +43,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
   try {
-    const student = await Student.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const student = await Student.findByIdAndDelete(id);
     if (!student) {
       return NextResponse.json({ error: 'Student not found' }, { status: 404 });
     }

@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/connect';
 import Subject from '@/lib/db/models/Subject';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
   try {
-    const subject = await Subject.findById(params.id);
+    const {id} = await params;
+    const subject = await Subject.findById(id);
     if (!subject) {
       return NextResponse.json({ error: 'Subject not found' }, { status: 404 });
     }
@@ -15,11 +16,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
   try {
     const body = await request.json();
-    const subject = await Subject.findByIdAndUpdate(params.id, body, {
+    const { id } = await params;
+    const subject = await Subject.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true
     });
@@ -32,10 +34,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
   try {
-    const subject = await Subject.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const subject = await Subject.findByIdAndDelete(id);
     if (!subject) {
       return NextResponse.json({ error: 'Subject not found' }, { status: 404 });
     }
