@@ -21,7 +21,8 @@ const StudentSchema = new mongoose.Schema({
   division_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Division',
-    required: true
+    required: true,
+    index: true
   }
 }, {
   timestamps: true

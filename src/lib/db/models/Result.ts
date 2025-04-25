@@ -6,6 +6,7 @@ const ResultSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Student",
       required: true,
+      index: true,
     },
     subject_id: {
       type: mongoose.Schema.Types.ObjectId,

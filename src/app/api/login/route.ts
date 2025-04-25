@@ -1,4 +1,4 @@
-import Staff from "@/lib/db/models/staff";
+import Staff from "@/lib/db/models/Staff";
 import jwt from "jsonwebtoken";
 import connectDB from "@/lib/db/connect";
 
