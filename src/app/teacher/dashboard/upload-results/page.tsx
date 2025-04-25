@@ -21,8 +21,8 @@ const singleResultSchema = z.object({
   ut2: z.string().transform(Number).pipe(
     z.number().min(0).max(25, "UT2 marks must be between 0 and 25")
   ),
-  mid_term: z.string().transform(Number).pipe(
-    z.number().min(0).max(50, "Mid-term marks must be between 0 and 50")
+  terminal: z.string().transform(Number).pipe(
+    z.number().min(0).max(50, "terminal marks must be between 0 and 50")
   ),
   annual: z.string().transform(Number).pipe(
     z.number().min(0).max(100, "Annual marks must be between 0 and 100")
@@ -43,7 +43,7 @@ export default function UploadResults() {
       roll_number: "",
       ut1: "",
       ut2: "",
-      mid_term: "",
+      terminal: "",
       annual: "",
     },
   });
@@ -242,10 +242,10 @@ export default function UploadResults() {
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="mid_term"
+                    name="terminal"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Mid-Term Marks (out of 50)</FormLabel>
+                        <FormLabel>terminal Marks (out of 50)</FormLabel>
                         <FormControl>
                           <Input type="number" {...field} />
                         </FormControl>
@@ -362,7 +362,7 @@ export default function UploadResults() {
                   <li>roll_number (Student Roll Number)</li>
                   <li>ut1 (Unit Test 1 marks, max 25)</li>
                   <li>ut2 (Unit Test 2 marks, max 25)</li>
-                  <li>mid_term (Mid Term marks, max 50)</li>
+                  <li>terminal (Mid Term marks, max 50)</li>
                   <li>annual (Annual Exam marks, max 100)</li>
                 </ul>
               </div>

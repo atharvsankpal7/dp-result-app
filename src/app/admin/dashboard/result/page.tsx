@@ -1,64 +1,81 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { api } from '@/lib/services/api'
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { api } from "@/lib/services/api";
 
 interface Result {
-  _id: string;
   student_id: {
     _id: string;
     name: string;
     roll_number: string;
   };
-  subject_id: {
-    _id: string;
-    name: string;
-  };
-  ut1: number;
-  ut2: number;
-  mid_term: number;
-  annual: number;
-  total: number;
-  remark: 'Pass' | 'Fail';
+  subject_results: {
+    subject_id: {
+      name: string;
+      course_code: string;
+    };
+    ut1: number;
+    ut2: number;
+    terminal: number;
+    annual: number;
+    total: number;
+    remark: "Pass" | "Fail";
+  }[];
 }
 
 export default function ResultPage() {
-  const [classes, setClasses] = useState([])
-  const [selectedClass, setSelectedClass] = useState('')
-  const [selectedDivision, setSelectedDivision] = useState('')
-  const [selectedSubject, setSelectedSubject] = useState('')
-  const [results, setResults] = useState<Result[]>([])
+  const [classes, setClasses] = useState<any[]>([]);
+  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedDivision, setSelectedDivision] = useState("");
+  const [results, setResults] = useState<Result[]>([]);
 
   useEffect(() => {
-    fetchClasses()
-  }, [])
+    fetchClasses();
+  }, []);
 
   useEffect(() => {
-    if (selectedClass && selectedDivision && selectedSubject) {
-      fetchResults()
+    if (selectedClass && selectedDivision) {
+      fetchResults();
     }
-  }, [selectedClass, selectedDivision, selectedSubject])
+  }, [selectedClass, selectedDivision]);
 
   const fetchClasses = async () => {
     try {
-      const data = await api.getClasses()
-      setClasses(data)
+      const data = await api.getClasses();
+      setClasses(data);
+
+      if (data.length > 0) {
+        const firstClass = data[0];
+        setSelectedClass(firstClass._id);
+      }
     } catch (error) {
-      console.error('Failed to fetch classes:', error)
+      console.error("Failed to fetch classes:", error);
     }
-  }
+  };
 
   const fetchResults = async () => {
     try {
-      const data = await api.getResults(selectedClass, selectedDivision, selectedSubject)
-      setResults(data)
+      const response = await fetch(
+        `/api/results/division?division=${selectedDivision}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch results");
+      }
+      const data = await response.json();
+      setResults(data);
     } catch (error) {
-      console.error('Failed to fetch results:', error)
+      console.error("Failed to fetch results:", error);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -71,7 +88,7 @@ export default function ResultPage() {
           <CardTitle>View Results</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <Select value={selectedClass} onValueChange={setSelectedClass}>
               <SelectTrigger>
                 <SelectValue placeholder="Select Class" />
@@ -85,35 +102,22 @@ export default function ResultPage() {
               </SelectContent>
             </Select>
 
-            <Select value={selectedDivision} onValueChange={setSelectedDivision}>
+            <Select
+              value={selectedDivision}
+              onValueChange={setSelectedDivision}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select Division" />
               </SelectTrigger>
               <SelectContent>
-                {selectedClass && classes
-                  .find((c: any) => c._id === selectedClass)
-                  ?.divisions.map((division: any) => (
-                    <SelectItem key={division._id} value={division._id}>
-                      {division.name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select Subject" />
-              </SelectTrigger>
-              <SelectContent>
-                {selectedDivision && classes
-                  .find((c: any) => c._id === selectedClass)
-                  ?.divisions
-                  .find((d: any) => d._id === selectedDivision)
-                  ?.subjects.map((subject: any) => (
-                    <SelectItem key={subject._id} value={subject._id}>
-                      {subject.name}
-                    </SelectItem>
-                  ))}
+                {selectedClass &&
+                  classes
+                    .find((c: any) => c._id === selectedClass)
+                    ?.divisions.map((division: any) => (
+                      <SelectItem key={division._id} value={division._id}>
+                        {division.name}
+                      </SelectItem>
+                    ))}
               </SelectContent>
             </Select>
           </div>
@@ -124,40 +128,65 @@ export default function ResultPage() {
                 <tr>
                   <th className="py-3 px-4 text-left">Roll No</th>
                   <th className="py-3 px-4 text-left">Name</th>
+                  <th className="py-3 px-4 text-left">Subject</th>
                   <th className="py-3 px-4 text-left">UT-1</th>
                   <th className="py-3 px-4 text-left">UT-2</th>
-                  <th className="py-3 px-4 text-left">Mid-Term</th>
+                  <th className="py-3 px-4 text-left">terminal</th>
                   <th className="py-3 px-4 text-left">Annual</th>
                   <th className="py-3 px-4 text-left">Total</th>
                   <th className="py-3 px-4 text-left">Remark</th>
                 </tr>
               </thead>
               <tbody>
-                {results.map((result) => (
-                  <tr key={result._id} className="border-t">
-                    <td className="py-3 px-4">{result.student_id.roll_number}</td>
-                    <td className="py-3 px-4">{result.student_id.name}</td>
-                    <td className="py-3 px-4">{result.ut1}</td>
-                    <td className="py-3 px-4">{result.ut2}</td>
-                    <td className="py-3 px-4">{result.mid_term}</td>
-                    <td className="py-3 px-4">{result.annual}</td>
-                    <td className="py-3 px-4">{result.total}</td>
-                    <td className="py-3 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        result.remark === 'Pass' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {result.remark}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {results.map((result) =>
+                  result.subject_results.map((subjectResult, index) => (
+                    <tr
+                      key={`${result.student_id._id}-${subjectResult.subject_id.name}`}
+                      className="border-t"
+                    >
+                      {index === 0 && (
+                        <>
+                          <td
+                            className="py-3 px-4"
+                            rowSpan={result.subject_results.length}
+                          >
+                            {result.student_id.roll_number}
+                          </td>
+                          <td
+                            className="py-3 px-4"
+                            rowSpan={result.subject_results.length}
+                          >
+                            {result.student_id.name}
+                          </td>
+                        </>
+                      )}
+                      <td className="py-3 px-4">
+                        {subjectResult.subject_id.name}
+                      </td>
+                      <td className="py-3 px-4">{subjectResult.ut1}</td>
+                      <td className="py-3 px-4">{subjectResult.ut2}</td>
+                      <td className="py-3 px-4">{subjectResult.terminal}</td>
+                      <td className="py-3 px-4">{subjectResult.annual}</td>
+                      <td className="py-3 px-4">{subjectResult.total}</td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs ${
+                            subjectResult.remark === "Pass"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {subjectResult.remark}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

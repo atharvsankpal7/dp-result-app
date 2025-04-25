@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         },
         ut1: result.ut1,
         ut2: result.ut2,
-        mid_term: result.mid_term,
+        terminal: result.terminal,
         annual: result.annual,
         total: result.total,
         remark: result.remark

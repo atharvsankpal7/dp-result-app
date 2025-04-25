@@ -5,14 +5,13 @@ import connectDB from "@/lib/db/connect";
 export async function POST(req: Request) {
   await connectDB();
   const { email, password } = await req.json();
-  console.log(email, password);
   const staff = await Staff.findOne({ email });
   if (!staff) {
     return new Response("Invalid email or password", { status: 401 });
   }
-  console.log(password)
   const isMatch = await staff.comparePassword(password);
   if (!isMatch) {
+    console.log("Invalid password");
     return new Response("Invalid email or password", { status: 401 });
   }
 

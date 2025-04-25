@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate total and determine remark
-    const total = (Number(body.ut1) + Number(body.ut2) + Number(body.mid_term) + Number(body.annual)) / 2;
+    const total = (Number(body.ut1) + Number(body.ut2) + Number(body.terminal) + Number(body.annual)) / 2;
     const remark = total >= 35 ? 'Pass' : 'Fail';
 
     // Create or update result
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       {
         ut1: body.ut1,
         ut2: body.ut2,
-        mid_term: body.mid_term,
+        terminal: body.terminal,
         annual: body.annual,
         total,
         remark

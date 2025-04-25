@@ -115,7 +115,7 @@ export default function ViewResults() {
                     <th className="py-3 px-4 text-left">Name</th>
                     <th className="py-3 px-4 text-left">UT-1</th>
                     <th className="py-3 px-4 text-left">UT-2</th>
-                    <th className="py-3 px-4 text-left">Mid-Term</th>
+                    <th className="py-3 px-4 text-left">terminal</th>
                     <th className="py-3 px-4 text-left">Annual</th>
                     <th className="py-3 px-4 text-left">Total</th>
                     <th className="py-3 px-4 text-left">Remark</th>
@@ -128,7 +128,7 @@ export default function ViewResults() {
                       <td className="py-3 px-4">{result.student_id.name}</td>
                       <td className="py-3 px-4">{result.ut1}</td>
                       <td className="py-3 px-4">{result.ut2}</td>
-                      <td className="py-3 px-4">{result.mid_term}</td>
+                      <td className="py-3 px-4">{result.terminal}</td>
                       <td className="py-3 px-4">{result.annual}</td>
                       <td className="py-3 px-4">{result.total}</td>
                       <td className="py-3 px-4">

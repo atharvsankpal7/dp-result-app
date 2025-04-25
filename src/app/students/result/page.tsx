@@ -25,7 +25,7 @@ interface Result {
   };
   ut1: number;
   ut2: number;
-  mid_term: number;
+  terminal: number;
   annual: number;
   total: number;
   remark: 'Pass' | 'Fail';
@@ -222,7 +222,7 @@ export default function StudentResult() {
                         <th className="py-3 px-4 text-left">Subject Code</th>
                         <th className="py-3 px-4 text-left">UT-1</th>
                         <th className="py-3 px-4 text-left">UT-2</th>
-                        <th className="py-3 px-4 text-left">Mid-Term</th>
+                        <th className="py-3 px-4 text-left">terminal</th>
                         <th className="py-3 px-4 text-left">Annual</th>
                         <th className="py-3 px-4 text-left">Total</th>
                         <th className="py-3 px-4 text-left">Remark</th>
@@ -236,7 +236,7 @@ export default function StudentResult() {
                           <td className="py-3 px-4">{result.subject_id.course_code}</td>
                           <td className="py-3 px-4">{result.ut1}</td>
                           <td className="py-3 px-4">{result.ut2}</td>
-                          <td className="py-3 px-4">{result.mid_term}</td>
+                          <td className="py-3 px-4">{result.terminal}</td>
                           <td className="py-3 px-4">{result.annual}</td>
                           <td className="py-3 px-4">{result.total}</td>
                           <td className="py-3 px-4">

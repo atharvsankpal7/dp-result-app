@@ -98,7 +98,6 @@ export default function ClassesPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Classes & Divisions</h1>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
@@ -120,7 +119,6 @@ export default function ClassesPage() {
                   Add Class
                 </Button>
               </div>
-
               <div className="rounded-md border">
                 <table className="w-full text-sm">
                   <thead className="bg-muted/50">
@@ -160,7 +158,6 @@ export default function ClassesPage() {
             </div>
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>Divisions</CardTitle>
@@ -179,7 +176,6 @@ export default function ClassesPage() {
                   ))}
                 </SelectContent>
               </Select>
-
               <div className="flex items-center gap-4">
                 <Input
                   placeholder="Enter division name (e.g., A)"
@@ -196,7 +192,6 @@ export default function ClassesPage() {
                   Add Division
                 </Button>
               </div>
-
               <div className="rounded-md border">
                 <table className="w-full text-sm">
                   <thead className="bg-muted/50">

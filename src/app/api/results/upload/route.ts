@@ -7,7 +7,7 @@ import { verifyAuth } from '@/lib/auth';
 
 // Validate result data
 function validateResult(data: any) {
-  const requiredFields = ['roll_number', 'ut1', 'ut2', 'mid_term', 'annual'];
+  const requiredFields = ['roll_number', 'ut1', 'ut2', 'terminal', 'annual'];
   const missingFields = requiredFields.filter(field => !data[field]);
   
   if (missingFields.length > 0) {
@@ -20,7 +20,7 @@ function validateResult(data: any) {
   // Validate marks ranges
   if (data.ut1 < 0 || data.ut1 > 25) return { valid: false, error: 'UT1 marks must be between 0 and 25' };
   if (data.ut2 < 0 || data.ut2 > 25) return { valid: false, error: 'UT2 marks must be between 0 and 25' };
-  if (data.mid_term < 0 || data.mid_term > 50) return { valid: false, error: 'Mid-term marks must be between 0 and 50' };
+  if (data.terminal < 0 || data.terminal > 50) return { valid: false, error: 'terminal marks must be between 0 and 50' };
   if (data.annual < 0 || data.annual > 100) return { valid: false, error: 'Annual marks must be between 0 and 100' };
 
   return { valid: true };
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Calculate total and determine remark
-      const total = (Number(row.ut1) + Number(row.ut2) + Number(row.mid_term) + Number(row.annual)) / 2;
+      const total = (Number(row.ut1) + Number(row.ut2) + Number(row.terminal) + Number(row.annual)) / 2;
       const remark = total >= 35 ? 'Pass' : 'Fail';
 
       // Create or update result
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
         {
           ut1: row.ut1,
           ut2: row.ut2,
-          mid_term: row.mid_term,
+          terminal: row.terminal,
           annual: row.annual,
           total,
           remark
