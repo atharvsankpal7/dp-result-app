@@ -321,13 +321,13 @@ export default function ResultPage() {
                   
                 </thead>
                 <tbody>
-                  {results.map((result) =>
-                    result.subject_results.map((subjectResult, index) => (
+                  {results.map((result, resultIndex) =>
+                    result.subject_results.map((subjectResult, subjectIndex) => (
                       <tr
-                        key={`${result.student_id._id}-${index}`}
+                        key={`${result.student_id._id}-${subjectResult.subject_id.course_code}-${subjectIndex}`}
                         className="border-t"
                       >
-                        {index === 0 && (
+                        {subjectIndex === 0 && (
                           <>
                             <td
                               className="py-3 px-4"

@@ -1,7 +1,7 @@
 import UploadResults from "@/components/shared/upload-results";
 
-const UploadResultsPageTeacher = () => {
+const UploadResultsPageAdmin = () => {
   return <UploadResults />;
 };
 
-export default UploadResultsPageTeacher;
+export default UploadResultsPageAdmin;

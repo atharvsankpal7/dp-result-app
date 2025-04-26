@@ -13,6 +13,8 @@ import {
   Book,
   ChevronLeft,
   ChevronRight,
+  UploadIcon,
+  DownloadIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -30,7 +32,8 @@ const Sidebar = () => {
     { name: "Teachers", href: "/admin/dashboard/teachers", icon: Book },
     { name: "Divisions", href: "/admin/dashboard/divisions", icon: BookOpen },
     { name: "Subjects", href: "/admin/dashboard/subjects", icon: FileText },
-    { name: "Result", href: "/admin/dashboard/result", icon: FileText },
+    { name: "Upload Result", href: "/admin/dashboard/result/upload", icon: UploadIcon },
+    { name: "Download Result", href: "/admin/dashboard/result/download", icon: DownloadIcon },
   ];
 
   const isActive = (path: string) => pathname?.startsWith(path);
