@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {  Edit, Trash } from "lucide-react";
+import { Edit, Trash } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -12,7 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { api } from "@/lib/services/api";
+import toast from "react-hot-toast";
 
 interface Class {
   _id: string;
@@ -36,6 +38,8 @@ export default function ClassesPage() {
   const [newClassName, setNewClassName] = useState("");
   const [newDivisionName, setNewDivisionName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [divisionError, setDivisionError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchClasses();
@@ -47,19 +51,21 @@ export default function ClassesPage() {
       setClasses(data);
       setSelectedClass(data[0]?._id || "");
     } catch (error) {
-      console.error("Failed to fetch classes:", error);
+      toast.error("Failed to fetch classes");
     }
   };
 
   const handleAddClass = async () => {
     if (!newClassName.trim()) return;
     setLoading(true);
+    setError(null);
     try {
       await api.createClass({ name: newClassName });
       setNewClassName("");
       await fetchClasses();
+      toast.success("Class added successfully");
     } catch (error) {
-      console.error("Failed to add class:", error);
+      setError("Failed to add class");
     } finally {
       setLoading(false);
     }
@@ -68,30 +74,56 @@ export default function ClassesPage() {
   const handleAddDivision = async () => {
     if (!selectedClass || !newDivisionName.trim()) return;
     setLoading(true);
+    setDivisionError(null);
     try {
-      await api.createDivision({
-        name: newDivisionName,
-        class_id: selectedClass,
+      const response = await fetch('/api/divisions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: newDivisionName,
+          class_id: selectedClass,
+        }),
       });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          throw new Error(data.error || 'Division with this name already exists in this class');
+        }
+        throw new Error(data.error || 'Failed to add division');
+      }
+
       setNewDivisionName("");
       await fetchClasses();
+      toast.success("Division added successfully");
     } catch (error) {
-      console.error("Failed to add division:", error);
+      setDivisionError(error instanceof Error ? error.message : 'Failed to add division');
     } finally {
       setLoading(false);
     }
   };
+
   const handleDeleteClass = async (classId: string) => {
+    const confirmed = window.confirm("Are you sure you want to delete this class?");
+    if (!confirmed) {
+      return;
+    }
+
     setLoading(true);
     try {
       await api.deleteClass(classId);
       await fetchClasses();
+      toast.success("Class deleted successfully");
     } catch (error) {
-      console.error("Failed to delete class:", error);
+      toast.error("Failed to delete class");
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -104,6 +136,11 @@ export default function ClassesPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
               <div className="flex items-center gap-4">
                 <Input
                   placeholder="Enter class name (e.g., 10th)"
@@ -163,6 +200,11 @@ export default function ClassesPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              {divisionError && (
+                <Alert variant="destructive">
+                  <AlertDescription>{divisionError}</AlertDescription>
+                </Alert>
+              )}
               <Select value={selectedClass} onValueChange={setSelectedClass}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Class" />

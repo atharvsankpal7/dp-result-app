@@ -23,10 +23,15 @@ const StudentSchema = new mongoose.Schema({
     ref: 'Division',
     required: true,
     index: true
+  },
+  status: {
+    type: String,
+    enum: ['Active', 'Inactive', 'Admission Cancelled'],
+    default: 'Active'
   }
 }, {
   timestamps: true
 });
 
 const Student = mongoose.models.Student || mongoose.model('Student', StudentSchema);
-export default Student; 
+export default Student;

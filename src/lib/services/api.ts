@@ -153,6 +153,9 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
+    if(res.status === 409) {
+      throw new Error('Student already exists');
+    }
     if (!res.ok) throw new Error('Failed to create student');
     return res.json();
   },

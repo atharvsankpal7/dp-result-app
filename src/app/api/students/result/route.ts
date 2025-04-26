@@ -6,14 +6,12 @@ import Result from "@/lib/db/models/Result";
 export async function POST(request: NextRequest) {
   await connectDB();
   try {
-    const { roll_number, mother_name, division_id, class_id } =
-      await request.json();
+    const { roll_number, mother_name, class_id } = await request.json();
 
-    // Find student by roll number, mother's name, division and class
+    // Find student by roll number and mother's name only
     const student = await Student.findOne({
       roll_number,
       mother_name: { $regex: new RegExp(`^${mother_name}$`, "i") }, // Case-insensitive match
-      division_id,
     }).populate({
       path: "division_id",
       populate: {

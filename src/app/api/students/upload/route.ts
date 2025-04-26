@@ -23,14 +23,13 @@ export async function POST(request: NextRequest) {
 
     const students = await Promise.all(
       data.map(async (row: any) => {
-        // Check if student already exists in this division
+        // Check if student already exists globally
         const existingStudent = await Student.findOne({
-          roll_number: row.roll_number,
-          division_id: division_id
+          roll_number: row.roll_number
         });
         
         if (existingStudent) {
-          throw new Error(`Student with roll number ${row.roll_number} already exists in this division`);
+          throw new Error(`Student with roll number ${row.roll_number} already exists`);
         }
 
         const student = await Student.create({

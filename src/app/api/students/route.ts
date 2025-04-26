@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/connect';
 import Student from '@/lib/db/models/Student';
-
+import  '@/lib/db/models/Division';
 export async function GET() {
   await connectDB();
   try {
@@ -9,7 +9,6 @@ export async function GET() {
       path: 'division_id',
       populate: { path: 'class_id' }
     });
-    console.log("students", students);
     return NextResponse.json(students);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch students' }, { status: 500 });
@@ -21,16 +20,15 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    // Check if roll number already exists in the same division
+    // Check if roll number already exists (globally)
     const existingStudent = await Student.findOne({
-      roll_number: body.roll_number,
-      division_id: body.division_id
+      roll_number: body.roll_number
     });
     
     if (existingStudent) {
       return NextResponse.json(
-        { error: 'Student with this roll number already exists in this division' },
-        { status: 400 }
+        { error: 'Student with this roll number already exists' },
+        { status: 409 }
       );
     }
 

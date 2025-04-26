@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
   await connectDB();
   try {
     const auth = await verifyAuth(request);
-    if (!auth.success || auth?.user?.role !== 'teacher') {
+    if (!auth.success ) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

@@ -42,10 +42,9 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get("file") as File;
-    const divisionId = formData.get("divisionId") as string;
     const subjectId = formData.get("subjectId") as string;
 
-    if (!file || !divisionId || !subjectId) {
+    if (!file || !subjectId) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -70,10 +69,9 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-      // Find student by roll number in the division
+      // Find student by roll number only
       const student = await Student.findOne({
-        roll_number: row.roll_number,
-        division_id: divisionId,
+        roll_number: row.roll_number
       });
 
       if (!student) {

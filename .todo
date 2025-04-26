@@ -16,3 +16,5 @@ so admin should have ability to add compulsory and optional subjects and then as
 and for the students page we should have division wise filtering and there we should have ability to edit the student button we should select the roll number of the student and there we can edit the division of the student and then when we are saving that we should get to select the optional subjects.
 -----------
 and in marks section we should have annual divided into 2 part theory and practicle but make sure that we have only the sum such that it doesn't exceed 100
+-----------
+when processing the excel sheets for uploading we should try to parse as much data as we can and for the data that is corrupt or can not be processed due to the conflicts then we should be send an array of confilicting data to the frontend and then we should be showimng that to the user, like if the excel sheet has a mistake in 19th row where we have result adding upto more that 100 then we should process everything except that row and show the error to the user. likewise if on 28th row and 31st row we have same roll number then we should show the error to the user that these two roll numbers are same.
