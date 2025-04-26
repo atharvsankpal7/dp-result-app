@@ -298,7 +298,7 @@ export default function StudentsPage() {
                   name="mother_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Mother's Name</FormLabel>
+                      <FormLabel>Mother&apos;s Name</FormLabel>
                       <FormControl>
                         <Input placeholder="Mother's name" {...field} />
                       </FormControl>
@@ -446,7 +446,7 @@ export default function StudentsPage() {
                 </Button>
               </div>
               <div className="text-sm text-muted-foreground">
-                Upload an Excel file containing student details: Name, Mother's
+                Upload an Excel file containing student details: Name, Mother&apos;s
                 Name, Roll Number
               </div>
             </div>
@@ -465,7 +465,7 @@ export default function StudentsPage() {
                 <tr>
                   <th className="py-3 px-4 text-left">Roll No</th>
                   <th className="py-3 px-4 text-left">Name</th>
-                  <th className="py-3 px-4 text-left">Mother's Name</th>
+                  <th className="py-3 px-4 text-left">Mother&apos;s Name</th>
                   <th className="py-3 px-4 text-left">Class</th>
                   <th className="py-3 px-4 text-left">Division</th>
                   <th className="py-3 px-4 text-left">Status</th>
@@ -548,7 +548,7 @@ export default function StudentsPage() {
                 name="mother_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Mother's Name</FormLabel>
+                    <FormLabel>Mother&apos;s Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Mother's name" {...field} />
                     </FormControl>
