@@ -3,6 +3,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { useState } from "react";
 
 interface ClassData {
   _id: string;
@@ -20,12 +21,6 @@ interface ClassData {
 interface SingleResultFormProps {
   form: any;
   classes: ClassData[];
-  selectedClass: string | null;
-  setSelectedClass: (value: string) => void;
-  selectedDivision: string | null;
-  setSelectedDivision: (value: string) => void;
-  selectedSubject: string | null;
-  setSelectedSubject: (value: string) => void;
   onSubmitSingleResult: (values: any) => void;
   loading: boolean;
 }
@@ -33,15 +28,13 @@ interface SingleResultFormProps {
 export const SingleResultForm: React.FC<SingleResultFormProps> = ({
   form,
   classes,
-  selectedClass,
-  setSelectedClass,
-  selectedDivision,
-  setSelectedDivision,
-  selectedSubject,
-  setSelectedSubject,
   onSubmitSingleResult,
   loading
 }) => {
+  const [selectedClass, setSelectedClass] = useState<string | null>(null);
+  const [selectedDivision, setSelectedDivision] = useState<string | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+
   const selectedClassData = classes.find((c) => c._id === selectedClass);
   const selectedDivisionData = selectedClassData?.divisions.find((d) => d._id === selectedDivision);
 

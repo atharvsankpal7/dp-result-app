@@ -1,7 +1,7 @@
-import UploadResults from "@/components/shared/upload-results";
+import TeacherUploadResults from "@/components/teacher/upload-results";
 
 const UploadResultsPageTeacher = () => {
-  return <UploadResults />;
+  return <TeacherUploadResults />;
 };
 
 export default UploadResultsPageTeacher;
