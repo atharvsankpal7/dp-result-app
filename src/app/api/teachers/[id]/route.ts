@@ -46,9 +46,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       new: true,
       runValidators: true
     })
-    .populate('assigned_subjects.subject_id')
+    .populate('assigned_subject.subject_id')
     .populate({
-      path: 'assigned_subjects.division_id',
+      path: 'assigned_subject.division_id',
       populate: { path: 'class_id' }
     });
 

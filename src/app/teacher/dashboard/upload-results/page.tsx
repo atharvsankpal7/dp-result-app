@@ -1,7 +1,13 @@
-import TeacherUploadResults from "@/components/teacher/upload-results";
+"use client";
 
-const UploadResultsPageTeacher = () => {
-  return <TeacherUploadResults />;
-};
+import React from "react";
+import { EditableResultsTable } from "@/components/teacher/editable-results-table";
 
-export default UploadResultsPageTeacher;
+export default function TeacherUploadResults() {
+  return (
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">Upload Results</h1>
+      <EditableResultsTable />
+    </div>
+  );
+}
