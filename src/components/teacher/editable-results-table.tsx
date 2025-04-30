@@ -41,42 +41,41 @@ interface ResultData {
 }
 
 export const EditableResultsTable = () => {
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [selectedSubject, setSelectedSubject] = useState<string>("");
+  const [subject, setSubject] = useState<Subject | null>(null);
   const [selectedDivision, setSelectedDivision] = useState<string>("");
   const [students, setStudents] = useState<Student[]>([]);
   const [results, setResults] = useState<{ [key: string]: ResultData }>({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchSubjects();
+    fetchAssignedSubject();
   }, []);
 
   useEffect(() => {
-    if (selectedDivision) {
-      fetchStudents();
-    }
-  }, [selectedDivision]);
+   fetchStudents()
+  }, []);
 
-  const fetchSubjects = async () => {
+  const fetchAssignedSubject = async () => {
     try {
       const response = await fetch("/api/teacher/subjects");
-      if (!response.ok) throw new Error("Failed to fetch subjects");
+      if (!response.ok) throw new Error("Failed to fetch subject");
       const data = await response.json();
-      setSubjects(data);
+      setSubject(data);
     } catch (error) {
-      console.error("Error fetching subjects:", error);
-      toast.error("Failed to fetch subjects");
+      console.error("Error fetching subject:", error);
+      toast.error("Failed to fetch assigned subject");
     }
   };
 
   const fetchStudents = async () => {
     try {
-      const response = await fetch(`/api/students?division=${selectedDivision}`);
+      const response = await fetch(
+        `/api/students?division`
+      );
       if (!response.ok) throw new Error("Failed to fetch students");
       const data = await response.json();
       setStudents(data);
-      
+
       // Initialize results object for new students
       const initialResults: { [key: string]: ResultData } = {};
       data.forEach((student: Student) => {
@@ -121,15 +120,17 @@ export const EditableResultsTable = () => {
 
       if (ut1 < 0 || ut1 > 25) return "UT1 marks must be between 0 and 25";
       if (ut2 < 0 || ut2 > 25) return "UT2 marks must be between 0 and 25";
-      if (terminal < 0 || terminal > 50) return "Terminal marks must be between 0 and 50";
-      if (annualTheory + annualPractical > 100) return "Total annual marks cannot exceed 100";
+      if (terminal < 0 || terminal > 50)
+        return "Terminal marks must be between 0 and 50";
+      if (annualTheory + annualPractical > 100)
+        return "Total annual marks cannot exceed 100";
     }
     return null;
   };
 
   const handleSave = async () => {
-    if (!selectedSubject || !selectedDivision) {
-      toast.error("Please select subject and division");
+    if (!subject || !selectedDivision) {
+      toast.error("Please select a division");
       return;
     }
 
@@ -145,7 +146,7 @@ export const EditableResultsTable = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          subject_id: selectedSubject,
+          subject_id: subject._id,
           results: Object.values(results),
         }),
       });
@@ -163,47 +164,13 @@ export const EditableResultsTable = () => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Enter Results</CardTitle>
+        <CardTitle>Enter Results for {subject?.name}</CardTitle>
         <Button onClick={handleSave} disabled={loading}>
           Save Results
         </Button>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select Subject" />
-              </SelectTrigger>
-              <SelectContent>
-                
-                  <SelectItem key={subject._id} value={subject._id}>
-                    {subject.name}
-                  </SelectItem>
-                
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={selectedDivision}
-              onValueChange={setSelectedDivision}
-              disabled={!selectedSubject}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select Division" />
-              </SelectTrigger>
-              <SelectContent>
-                {subjects
-                  .find((s) => s._id === selectedSubject)
-                  ?.divisions.map((division) => (
-                    <SelectItem key={division._id} value={division._id}>
-                      {division.class_id.name} - {division.name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-          </div>
-
           {students.length > 0 && (
             <div className="rounded-md border">
               <table className="w-full text-sm">
@@ -228,7 +195,11 @@ export const EditableResultsTable = () => {
                           type="number"
                           value={results[student._id]?.ut1}
                           onChange={(e) =>
-                            handleInputChange(student._id, "ut1", e.target.value)
+                            handleInputChange(
+                              student._id,
+                              "ut1",
+                              e.target.value
+                            )
                           }
                           min="0"
                           max="25"
@@ -239,7 +210,11 @@ export const EditableResultsTable = () => {
                           type="number"
                           value={results[student._id]?.ut2}
                           onChange={(e) =>
-                            handleInputChange(student._id, "ut2", e.target.value)
+                            handleInputChange(
+                              student._id,
+                              "ut2",
+                              e.target.value
+                            )
                           }
                           min="0"
                           max="25"
