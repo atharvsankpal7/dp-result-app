@@ -1,16 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/connect';
 import Student from '@/lib/db/models/Student';
-import  '@/lib/db/models/Division';
-export async function GET() {
+import Division from '@/lib/db/models/Division';
+import '@/lib/db/models/Division';
+
+export async function GET(request: NextRequest) {
   await connectDB();
   try {
+    const { searchParams } = new URL(request.url);
+    const subjectId = searchParams.get('subject');
+
+    if (subjectId) {
+      // Find all divisions that have this subject
+      const divisions = await Division.find({ subjects: subjectId });
+      const divisionIds = divisions.map(div => div._id);
+
+      // Find all students in these divisions
+      const students = await Student.find({
+        division_id: { $in: divisionIds },
+        status: 'Active'
+      }).sort({ roll_number: 1 });
+
+      return NextResponse.json(students);
+    }
+
+    // If no subject ID provided, return all students
     const students = await Student.find({}).populate({
       path: 'division_id',
       populate: { path: 'class_id' }
     });
     return NextResponse.json(students);
   } catch (error) {
+    console.error('Failed to fetch students:', error);
     return NextResponse.json({ error: 'Failed to fetch students' }, { status: 500 });
   }
 }

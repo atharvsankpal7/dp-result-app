@@ -2,14 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import toast from "react-hot-toast";
+import { Save, Check } from "lucide-react";
 
 interface Student {
   _id: string;
@@ -21,14 +15,6 @@ interface Subject {
   _id: string;
   name: string;
   course_code: string;
-  divisions: {
-    _id: string;
-    name: string;
-    class_id: {
-      _id: string;
-      name: string;
-    };
-  }[];
 }
 
 interface ResultData {
@@ -42,7 +28,6 @@ interface ResultData {
 
 export const EditableResultsTable = () => {
   const [subject, setSubject] = useState<Subject | null>(null);
-  const [selectedDivision, setSelectedDivision] = useState<string>("");
   const [students, setStudents] = useState<Student[]>([]);
   const [results, setResults] = useState<{ [key: string]: ResultData }>({});
   const [loading, setLoading] = useState(false);
@@ -52,8 +37,10 @@ export const EditableResultsTable = () => {
   }, []);
 
   useEffect(() => {
-   fetchStudents()
-  }, []);
+    if (subject) {
+      fetchStudents();
+    }
+  }, [subject]);
 
   const fetchAssignedSubject = async () => {
     try {
@@ -68,10 +55,10 @@ export const EditableResultsTable = () => {
   };
 
   const fetchStudents = async () => {
+    if (!subject?._id) return;
+
     try {
-      const response = await fetch(
-        `/api/students?division`
-      );
+      const response = await fetch(`/api/students?subject=${subject._id}`);
       if (!response.ok) throw new Error("Failed to fetch students");
       const data = await response.json();
       setStudents(data);
@@ -89,6 +76,24 @@ export const EditableResultsTable = () => {
         };
       });
       setResults(initialResults);
+
+      // Fetch existing draft results
+      const draftsResponse = await fetch("/api/teacher/results/drafts");
+      if (draftsResponse.ok) {
+        const draftsData = await draftsResponse.json();
+        const draftResults = { ...initialResults };
+        draftsData.forEach((draft: any) => {
+          draftResults[draft.student_id._id] = {
+            student_id: draft.student_id._id,
+            ut1: draft.ut1.toString(),
+            ut2: draft.ut2.toString(),
+            terminal: draft.terminal.toString(),
+            annual_theory: draft.annual_theory.toString(),
+            annual_practical: draft.annual_practical.toString(),
+          };
+        });
+        setResults(draftResults);
+      }
     } catch (error) {
       console.error("Error fetching students:", error);
       toast.error("Failed to fetch students");
@@ -129,8 +134,8 @@ export const EditableResultsTable = () => {
   };
 
   const handleSave = async () => {
-    if (!subject || !selectedDivision) {
-      toast.error("Please select a division");
+    if (!subject) {
+      toast.error("No subject assigned");
       return;
     }
 
@@ -152,10 +157,39 @@ export const EditableResultsTable = () => {
       });
 
       if (!response.ok) throw new Error("Failed to save results");
-      toast.success("Results saved successfully");
+      toast.success("Results saved as draft");
     } catch (error) {
       console.error("Error saving results:", error);
       toast.error("Failed to save results");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!subject) {
+      toast.error("No subject assigned");
+      return;
+    }
+
+    const error = validateResults();
+    if (error) {
+      toast.error(error);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch("/api/teacher/results/submit", {
+        method: "POST",
+      });
+
+      if (!response.ok) throw new Error("Failed to submit results");
+      toast.success("Results submitted successfully");
+      await fetchStudents(); // Refresh the data
+    } catch (error) {
+      console.error("Error submitting results:", error);
+      toast.error("Failed to submit results");
     } finally {
       setLoading(false);
     }
@@ -165,13 +199,20 @@ export const EditableResultsTable = () => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Enter Results for {subject?.name}</CardTitle>
-        <Button onClick={handleSave} disabled={loading}>
-          Save Results
-        </Button>
+        <div className="space-x-2">
+          <Button onClick={handleSave} disabled={loading}>
+            <Save className="mr-2 h-4 w-4" />
+            Save as Draft
+          </Button>
+          <Button onClick={handleSubmit} disabled={loading} variant="default">
+            <Check className="mr-2 h-4 w-4" />
+            Submit Results
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {students.length > 0 && (
+          {students.length > 0 ? (
             <div className="rounded-md border">
               <table className="w-full text-sm">
                 <thead className="bg-muted/50">
@@ -269,6 +310,10 @@ export const EditableResultsTable = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No students found for this subject
             </div>
           )}
         </div>
