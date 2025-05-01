@@ -26,11 +26,27 @@ interface ResultData {
   annual_practical: string;
 }
 
+interface BufferedResult {
+  _id: string;
+  student_id: Student;
+  subject_id: Subject;
+  ut1: number;
+  ut2: number;
+  terminal: number;
+  annual_theory: number;
+  annual_practical: number;
+  total: number;
+  remark: "Pass" | "Fail";
+  status: "draft" | "submitted" | "approved";
+}
+
 export const EditableResultsTable = () => {
   const [subject, setSubject] = useState<Subject | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [results, setResults] = useState<{ [key: string]: ResultData }>({});
   const [loading, setLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isApproved, setIsApproved] = useState(false);
 
   useEffect(() => {
     fetchAssignedSubject();
@@ -80,9 +96,14 @@ export const EditableResultsTable = () => {
       // Fetch existing draft results
       const draftsResponse = await fetch("/api/teacher/results/drafts");
       if (draftsResponse.ok) {
-        const draftsData = await draftsResponse.json();
+        const draftsData: BufferedResult[] = await draftsResponse.json();
         const draftResults = { ...initialResults };
-        draftsData.forEach((draft: any) => {
+        draftsData.forEach((draft) => {
+          if (draft.status === "submitted") {
+            setIsSubmitted(true);
+          } else if (draft.status === "approved") {
+            setIsApproved(true);
+          }
           draftResults[draft.student_id._id] = {
             student_id: draft.student_id._id,
             ut1: draft.ut1.toString(),
@@ -105,6 +126,8 @@ export const EditableResultsTable = () => {
     field: keyof ResultData,
     value: string
   ) => {
+    if (isSubmitted || isApproved) return;
+
     setResults((prev) => ({
       ...prev,
       [studentId]: {
@@ -134,10 +157,7 @@ export const EditableResultsTable = () => {
   };
 
   const handleSave = async () => {
-    if (!subject) {
-      toast.error("No subject assigned");
-      return;
-    }
+    if (!subject || isSubmitted || isApproved) return;
 
     const error = validateResults();
     if (error) {
@@ -167,10 +187,7 @@ export const EditableResultsTable = () => {
   };
 
   const handleSubmit = async () => {
-    if (!subject) {
-      toast.error("No subject assigned");
-      return;
-    }
+    if (!subject || isSubmitted || isApproved) return;
 
     const error = validateResults();
     if (error) {
@@ -186,7 +203,7 @@ export const EditableResultsTable = () => {
 
       if (!response.ok) throw new Error("Failed to submit results");
       toast.success("Results submitted successfully");
-      await fetchStudents(); // Refresh the data
+      setIsSubmitted(true);
     } catch (error) {
       console.error("Error submitting results:", error);
       toast.error("Failed to submit results");
@@ -200,18 +217,40 @@ export const EditableResultsTable = () => {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Enter Results for {subject?.name}</CardTitle>
         <div className="space-x-2">
-          <Button onClick={handleSave} disabled={loading}>
-            <Save className="mr-2 h-4 w-4" />
-            Save as Draft
-          </Button>
-          <Button onClick={handleSubmit} disabled={loading} variant="default">
-            <Check className="mr-2 h-4 w-4" />
-            Submit Results
-          </Button>
+          {!isApproved && (
+            <>
+              <Button
+                onClick={handleSave}
+                disabled={loading || isSubmitted}
+                variant={isSubmitted ? "outline" : "default"}
+              >
+                <Save className="mr-2 h-4 w-4" />
+                Save as Draft
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={loading || isSubmitted}
+                variant={isSubmitted ? "outline" : "default"}
+              >
+                <Check className="mr-2 h-4 w-4" />
+                {isSubmitted ? "Submitted" : "Submit Results"}
+              </Button>
+            </>
+          )}
         </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
+          {isApproved && (
+            <div className="bg-green-100 text-green-800 p-4 rounded-md mb-4">
+              These results have been approved and cannot be modified.
+            </div>
+          )}
+          {isSubmitted && !isApproved && (
+            <div className="bg-yellow-100 text-yellow-800 p-4 rounded-md mb-4">
+              Results have been submitted and are awaiting approval.
+            </div>
+          )}
           {students.length > 0 ? (
             <div className="rounded-md border">
               <table className="w-full text-sm">
@@ -244,6 +283,7 @@ export const EditableResultsTable = () => {
                           }
                           min="0"
                           max="25"
+                          disabled={isSubmitted || isApproved}
                         />
                       </td>
                       <td className="py-3 px-4">
@@ -259,6 +299,7 @@ export const EditableResultsTable = () => {
                           }
                           min="0"
                           max="25"
+                          disabled={isSubmitted || isApproved}
                         />
                       </td>
                       <td className="py-3 px-4">
@@ -274,6 +315,7 @@ export const EditableResultsTable = () => {
                           }
                           min="0"
                           max="50"
+                          disabled={isSubmitted || isApproved}
                         />
                       </td>
                       <td className="py-3 px-4">
@@ -289,6 +331,7 @@ export const EditableResultsTable = () => {
                           }
                           min="0"
                           max="70"
+                          disabled={isSubmitted || isApproved}
                         />
                       </td>
                       <td className="py-3 px-4">
@@ -304,6 +347,7 @@ export const EditableResultsTable = () => {
                           }
                           min="0"
                           max="30"
+                          disabled={isSubmitted || isApproved}
                         />
                       </td>
                     </tr>

@@ -15,6 +15,7 @@ import {
   ChevronRight,
   UploadIcon,
   DownloadIcon,
+  CheckSquare,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -34,6 +35,7 @@ const Sidebar = () => {
     { name: "Subjects", href: "/admin/dashboard/subjects", icon: FileText },
     { name: "Upload Result", href: "/admin/dashboard/result/upload", icon: UploadIcon },
     { name: "Download Result", href: "/admin/dashboard/result/download", icon: DownloadIcon },
+    { name: "Submitted Results", href: "/admin/dashboard/submitted-results", icon: CheckSquare },
   ];
 
   const isActive = (path: string) => pathname?.startsWith(path);
@@ -81,7 +83,7 @@ const Sidebar = () => {
   return (
     <>
       {/* Mobile Menu Button */}
-      <div className="md:hidden fixed top-0 left-0 z-50 p-4 ">
+      <div className="md:hidden fixed top-0 left-0 z-50 p-4">
         <button onClick={toggleMobileMenu}>
           {isMobileMenuOpen ? <X className="h-6 w-6 cursor-pointer" /> : <Menu className="h-6 w-6 cursor-pointer" />}
         </button>
@@ -129,12 +131,12 @@ const Sidebar = () => {
             </button>
           </div>
           <nav className="flex-1 px-3 space-y-2">{navigation.map(renderNavItem)}</nav>
-          <div className="p-4 border-t border-gray-200 ">
+          <div className="p-4 border-t border-gray-200">
             <button
               onClick={handleLogout}
               className="group flex items-center px-3 py-3 text-sm font-medium text-red-600 rounded-md hover:bg-red-50 w-full border-1 border-red-500"
             >
-              <LogOut className="mr-3 h-5 w-5 text-red-500 " />
+              <LogOut className="mr-3 h-5 w-5 text-red-500" />
               <span className="overflow-hidden whitespace-nowrap transition-opacity duration-300"
                     style={{ opacity: isCollapsed ? 0 : 1, width: isCollapsed ? 0 : 'auto', maxWidth: isCollapsed ? 0 : '100%' }}>
                 Logout
