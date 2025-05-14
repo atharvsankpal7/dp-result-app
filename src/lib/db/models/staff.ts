@@ -27,7 +27,7 @@ const StaffSchema = new mongoose.Schema<IStaff>({
   assigned_subject: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Subject",
-    required: true,
+    // required: true,
   },
 });
 
@@ -50,7 +50,9 @@ StaffSchema.methods.comparePassword = async function (
   this: IStaff,
   candidatePassword: string
 ) {
-  return bcrypt.compare(candidatePassword, this.password);
+  console.log(this.password);
+  console.log(candidatePassword);
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 
 const Staff =

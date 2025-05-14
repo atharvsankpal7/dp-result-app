@@ -1,4 +1,4 @@
-import Staff from "@/lib/db/models/Staff";
+import Staff from "@/lib/db/models/staff";
 import jwt from "jsonwebtoken";
 
 export async function POST(req: Request) {

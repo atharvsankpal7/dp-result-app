@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/connect';
-import Teacher from '@/lib/db/models/Staff';
+import Teacher from '@/lib/db/models/staff';
 import * as XLSX from 'xlsx';
 
 export async function POST(request: NextRequest) {
