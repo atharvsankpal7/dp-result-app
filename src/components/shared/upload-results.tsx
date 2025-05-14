@@ -165,12 +165,12 @@ export default function UploadResults() {
         <SingleResultForm
           form={form}
           classes={classes}
-          selectedClass={selectedClass}
-          setSelectedClass={setSelectedClass}
-          selectedDivision={selectedDivision}
-          setSelectedDivision={setSelectedDivision}
-          selectedSubject={selectedSubject}
-          setSelectedSubject={setSelectedSubject}
+          // selectedClass={selectedClass}
+          // setSelectedClass={setSelectedClass}
+          // selectedDivision={selectedDivision}
+          // setSelectedDivision={setSelectedDivision}
+          // selectedSubject={selectedSubject}
+          // setSelectedSubject={setSelectedSubject}
           onSubmitSingleResult={onSubmitSingleResult}
           loading={loading}
         />
