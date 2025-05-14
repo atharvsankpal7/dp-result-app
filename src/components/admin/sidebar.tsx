@@ -15,6 +15,7 @@ import {
   ChevronRight,
   UploadIcon,
   DownloadIcon,
+  Edit,
   CheckSquare,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -35,7 +36,8 @@ const Sidebar = () => {
     { name: "Subjects", href: "/admin/dashboard/subjects", icon: FileText },
     { name: "Upload Result", href: "/admin/dashboard/result/upload", icon: UploadIcon },
     { name: "Download Result", href: "/admin/dashboard/result/download", icon: DownloadIcon },
-    { name: "Submitted Results", href: "/admin/dashboard/submitted-results", icon: CheckSquare },
+    { name: "Edit Results", href: "/admin/dashboard/edit-results", icon: Edit },
+    // { name: "Submitted Results", href: "/admin/dashboard/submitted-results", icon: CheckSquare },
   ];
 
   const isActive = (path: string) => pathname?.startsWith(path);

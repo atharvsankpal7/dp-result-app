@@ -1,9 +1,19 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
-import { Save, Check } from "lucide-react";
+import { Save } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { api } from "@/lib/services/api";
 
 interface Student {
   _id: string;
@@ -27,6 +37,7 @@ interface ResultData {
 }
 
 interface ExistingResult {
+  _id: string;
   student_id: Student;
   subject_id: Subject;
   ut1: number;
@@ -38,49 +49,45 @@ interface ExistingResult {
   remark: "Pass" | "Fail";
 }
 
-const STORAGE_KEY = 'teacher_results';
-
-export const EditableResultsTable = () => {
-  const [subject, setSubject] = useState<Subject | null>(null);
+const AdminEditResultsPage = () => {
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [students, setStudents] = useState<Student[]>([]);
   const [results, setResults] = useState<{ [key: string]: ResultData }>({});
   const [existingResults, setExistingResults] = useState<{ [key: string]: ExistingResult }>({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchAssignedSubject();
+    fetchSubjects();
   }, []);
 
   useEffect(() => {
-    if (subject) {
+    if (selectedSubject) {
       fetchStudents();
-      loadFromLocalStorage();
     }
-  }, [subject]);
+  }, [selectedSubject]);
 
-  const fetchAssignedSubject = async () => {
+  const fetchSubjects = async () => {
     try {
-      const response = await fetch("/api/teacher/subjects");
-      if (!response.ok) throw new Error("Failed to fetch subject");
-      const data = await response.json();
-      setSubject(data);
+      const data = await api.getSubjects();
+      setSubjects(data);
     } catch (error) {
-      console.error("Error fetching subject:", error);
-      toast.error("Failed to fetch assigned subject");
+      console.error("Error fetching subjects:", error);
+      toast.error("Failed to fetch subjects");
     }
   };
 
   const fetchStudents = async () => {
-    if (!subject?._id) return;
+    if (!selectedSubject) return;
 
     try {
-      const response = await fetch(`/api/students?subject=${subject._id}`);
+      const response = await fetch(`/api/students?subject=${selectedSubject}`);
       if (!response.ok) throw new Error("Failed to fetch students");
       const studentsData = await response.json();
       setStudents(studentsData);
 
       // Fetch existing results
-      const resultsResponse = await fetch(`/api/results?subject=${subject._id}`);
+      const resultsResponse = await fetch(`/api/results?subject=${selectedSubject}`);
       if (resultsResponse.ok) {
         const existingResultsData = await resultsResponse.json();
         const resultsMap: { [key: string]: ExistingResult } = {};
@@ -88,22 +95,25 @@ export const EditableResultsTable = () => {
           resultsMap[result.student_id._id] = result;
         });
         setExistingResults(resultsMap);
+
+        // Initialize results state with existing data
+        const initialResults: { [key: string]: ResultData } = {};
+        studentsData.forEach((student: Student) => {
+          const existingResult = resultsMap[student._id];
+          initialResults[student._id] = {
+            student_id: student._id,
+            ut1: existingResult?.ut1?.toString() || "",
+            ut2: existingResult?.ut2?.toString() || "",
+            terminal: existingResult?.terminal?.toString() || "",
+            annual_theory: existingResult?.annual_theory?.toString() || "",
+            annual_practical: existingResult?.annual_practical?.toString() || "",
+          };
+        });
+        setResults(initialResults);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Failed to fetch data");
-    }
-  };
-
-  const loadFromLocalStorage = () => {
-    const savedResults = localStorage.getItem(STORAGE_KEY);
-    if (savedResults) {
-      try {
-        const parsedResults = JSON.parse(savedResults);
-        setResults(parsedResults);
-      } catch (error) {
-        console.error("Error loading from local storage:", error);
-      }
     }
   };
 
@@ -112,20 +122,14 @@ export const EditableResultsTable = () => {
     field: keyof ResultData,
     value: string
   ) => {
-    if (existingResults[studentId]?.[field]) return;
-
-    setResults((prev) => {
-      const newResults = {
-        ...prev,
-        [studentId]: {
-          ...prev[studentId],
-          student_id: studentId,
-          [field]: value,
-        },
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newResults));
-      return newResults;
-    });
+    setResults((prev) => ({
+      ...prev,
+      [studentId]: {
+        ...prev[studentId],
+        student_id: studentId,
+        [field]: value,
+      },
+    }));
   };
 
   const validateResults = () => {
@@ -148,18 +152,8 @@ export const EditableResultsTable = () => {
     return null;
   };
 
-  const handleSave = () => {
-    const error = validateResults();
-    if (error) {
-      toast.error(error);
-      return;
-    }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
-    toast.success("Results saved to local storage");
-  };
-
-  const handleSubmit = async () => {
-    if (!subject) return;
+  const handleSave = async () => {
+    if (!selectedSubject) return;
 
     const error = validateResults();
     if (error) {
@@ -179,41 +173,54 @@ export const EditableResultsTable = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             ...result,
-            subject_id: subject._id,
+            subject_id: selectedSubject,
           }),
         });
       }
 
-      toast.success("Results submitted successfully");
-      localStorage.removeItem(STORAGE_KEY);
-      setResults({});
+      toast.success("Results saved successfully");
       await fetchStudents(); // Refresh existing results
     } catch (error) {
-      console.error("Error submitting results:", error);
-      toast.error("Failed to submit results");
+      console.error("Error saving results:", error);
+      toast.error("Failed to save results");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Enter Results for {subject?.name}</CardTitle>
-        <div className="space-x-2">
-          <Button onClick={handleSave} disabled={loading}>
-            <Save className="mr-2 h-4 w-4" />
-            Save
-          </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
-            <Check className="mr-2 h-4 w-4" />
-            Submit Results
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {students.length > 0 ? (
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">Edit Results</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>Select Subject</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a subject" />
+            </SelectTrigger>
+            <SelectContent>
+              {subjects.map((subject) => (
+                <SelectItem key={subject._id} value={subject._id}>
+                  {subject.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
+      {selectedSubject && students.length > 0 && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Edit Results</CardTitle>
+            <Button onClick={handleSave} disabled={loading}>
+              <Save className="mr-2 h-4 w-4" />
+              Save Results
+            </Button>
+          </CardHeader>
+          <CardContent>
             <div className="rounded-md border">
               <table className="w-full text-sm">
                 <thead className="bg-muted/50">
@@ -245,7 +252,6 @@ export const EditableResultsTable = () => {
                           }
                           min="0"
                           max="25"
-                          disabled={!!existingResults[student._id]?.ut1}
                           placeholder={existingResults[student._id]?.ut1?.toString() || ""}
                         />
                       </td>
@@ -262,7 +268,6 @@ export const EditableResultsTable = () => {
                           }
                           min="0"
                           max="25"
-                          disabled={!!existingResults[student._id]?.ut2}
                           placeholder={existingResults[student._id]?.ut2?.toString() || ""}
                         />
                       </td>
@@ -279,7 +284,6 @@ export const EditableResultsTable = () => {
                           }
                           min="0"
                           max="50"
-                          disabled={!!existingResults[student._id]?.terminal}
                           placeholder={existingResults[student._id]?.terminal?.toString() || ""}
                         />
                       </td>
@@ -296,7 +300,6 @@ export const EditableResultsTable = () => {
                           }
                           min="0"
                           max="70"
-                          disabled={!!existingResults[student._id]?.annual_theory}
                           placeholder={existingResults[student._id]?.annual_theory?.toString() || ""}
                         />
                       </td>
@@ -313,7 +316,6 @@ export const EditableResultsTable = () => {
                           }
                           min="0"
                           max="30"
-                          disabled={!!existingResults[student._id]?.annual_practical}
                           placeholder={existingResults[student._id]?.annual_practical?.toString() || ""}
                         />
                       </td>
@@ -322,13 +324,11 @@ export const EditableResultsTable = () => {
                 </tbody>
               </table>
             </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No students found for this subject
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 };
+
+export default AdminEditResultsPage;    
