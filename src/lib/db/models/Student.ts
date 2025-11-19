@@ -28,6 +28,20 @@ const StudentSchema = new mongoose.Schema({
     type: String,
     enum: ['Active', 'Inactive', 'Admission Cancelled'],
     default: 'Active'
+  },
+  mobile_number: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
+  },
+  password: {
+    type: String,
+    select: false
+  },
+  otp: {
+    code: { type: String, select: false },
+    expiresAt: { type: Date, select: false }
   }
 }, {
   timestamps: true

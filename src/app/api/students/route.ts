@@ -42,13 +42,18 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // Check if roll number already exists (globally)
+    // Check if roll number or mobile number already exists
     const existingStudent = await Student.findOne({
-      roll_number: body.roll_number
+      $or: [
+        { roll_number: body.roll_number },
+        { mobile_number: body.mobile_number }
+      ]
     });
     
     if (existingStudent) {
+      const field = existingStudent.roll_number === body.roll_number ? 'roll number' : 'mobile number';
       return NextResponse.json(
-        { error: 'Student with this roll number already exists' },
+        { error: `Student with this ${field} already exists` },
         { status: 409 }
       );
     }
@@ -57,6 +62,7 @@ export async function POST(request: NextRequest) {
       name: body.name,
       mother_name: body.mother_name,
       roll_number: body.roll_number,
+      mobile_number: body.mobile_number,
       division_id: body.division_id
     });
 
