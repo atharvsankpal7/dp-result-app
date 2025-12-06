@@ -19,13 +19,30 @@ interface Student {
   };
 }
 
+interface Result {
+  _id: string;
+  subject_id: {
+    name: string;
+    course_code: string;
+  };
+  ut1: number;
+  ut2: number;
+  terminal: number;
+  annual_practical: number;
+  annual_theory: number;
+  total: number;
+  remark: string;
+}
+
 export default function StudentDashboard() {
   const [student, setStudent] = useState<Student | null>(null);
+  const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     fetchStudentProfile();
+    fetchResults();
   }, []);
 
   const fetchStudentProfile = async () => {
@@ -45,14 +62,22 @@ export default function StudentDashboard() {
     }
   };
 
+  const fetchResults = async () => {
+    try {
+      const response = await fetch("/api/student/results");
+      if (response.ok) {
+        const data = await response.json();
+        setResults(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch results:", error);
+      toast.error("Failed to load results");
+    }
+  };
+
   const handleLogout = async () => {
     try {
-      await fetch("/api/logout", { method: "POST" }); // Assuming logout API exists or I need to create one/clear cookie
-      // Actually, I should check if there is a logout API. If not, I'll just delete cookie client side or create one.
-      // Usually /api/auth/logout or similar.
-      // Let's assume I need to implement logout or just redirect to login which might not clear cookie.
-      // I'll implement a simple logout by clearing cookie.
-      document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+      await fetch("/api/logout", { method: "POST" }); 
       router.push("/student/login");
     } catch (error) {
       console.error("Logout failed", error);
@@ -102,6 +127,57 @@ export default function StudentDashboard() {
               <p className="text-sm font-medium text-muted-foreground">Mobile Number</p>
               <p className="text-lg">{student.mobile_number}</p>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Academic Results</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-xs uppercase bg-muted/50">
+                <tr>
+                  <th className="px-4 py-3">Subject</th>
+                  <th className="px-4 py-3">Class</th>
+                  <th className="px-4 py-3">Division</th>
+                  <th className="px-4 py-3">UT1 (25)</th>
+                  <th className="px-4 py-3">UT2 (25)</th>
+                  <th className="px-4 py-3">Terminal (50)</th>
+                  <th className="px-4 py-3">Theory (100)</th>
+                  <th className="px-4 py-3">Practical (100)</th>
+                  <th className="px-4 py-3">Total (100)</th>
+                  <th className="px-4 py-3">Remark</th>
+                </tr>
+              </thead>
+              <tbody>
+                {results.map((result) => (
+                  <tr key={result._id} className="border-b hover:bg-muted/50">
+                    <td className="px-4 py-3 font-medium">{result.subject_id.name}</td>
+                    <td className="px-4 py-3">{student.division_id?.class_id?.name}</td>
+                    <td className="px-4 py-3">{student.division_id?.name}</td>
+                    <td className="px-4 py-3">{result.ut1}</td>
+                    <td className="px-4 py-3">{result.ut2}</td>
+                    <td className="px-4 py-3">{result.terminal}</td>
+                    <td className="px-4 py-3">{result.annual_theory}</td>
+                    <td className="px-4 py-3">{result.annual_practical}</td>
+                    <td className="px-4 py-3">{result.total}</td>
+                    <td className={`px-4 py-3 font-bold ${result.remark === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
+                      {result.remark}
+                    </td>
+                  </tr>
+                ))}
+                {results.length === 0 && (
+                  <tr>
+                    <td colSpan={10} className="px-4 py-3 text-center text-muted-foreground">
+                      No results found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>
