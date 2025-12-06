@@ -11,14 +11,17 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
 
   // If there's no token and the user is trying to access a protected route
-
-  if (!token && !request?.nextUrl.pathname.endsWith("/login")) {
+  if (!token && !request?.nextUrl.pathname.endsWith("/login") && !request?.nextUrl.pathname.endsWith("/student/login")) {
     console.log("No token, redirecting to login");
+    // If trying to access student area, redirect to student login
+    if (request?.nextUrl.pathname.startsWith("/student")) {
+      return NextResponse.redirect(new URL("/student/login", request.url));
+    }
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
   // If there's a token and the user is trying to access the login page
-  if (token && request?.nextUrl?.pathname?.startsWith("/login")) {
+  if (token && (request?.nextUrl?.pathname?.startsWith("/login") || request?.nextUrl?.pathname?.startsWith("/student/login"))) {
     console.log("Token found, redirecting to home");
     return NextResponse.redirect(new URL("/", request.url));
   }

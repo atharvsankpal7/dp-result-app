@@ -1,57 +1,78 @@
-import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/db/connect';
-import Student from '@/lib/db/models/Student';
-import bcrypt from 'bcryptjs';
+import Student from "@/lib/db/models/Student";
+import jwt from "jsonwebtoken";
+import connectDB from "@/lib/db/connect";
+import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 
-export async function POST(request: NextRequest) {
-  await connectDB();
+
+export async function POST(req: NextRequest) {
   try {
-    const { mobile_number, password } = await request.json();
+    await connectDB();
+    const { mobile_number, password } = await req.json();
 
-    if (!mobile_number) {
-      return NextResponse.json({ error: 'Mobile number is required' }, { status: 400 });
+    if (!mobile_number || !password) {
+      return NextResponse.json(
+        { error: "Mobile number and password are required" },
+        { status: 400 }
+      );
     }
 
-    const student = await Student.findOne({ mobile_number }).select('+password');
-
+    const student = await Student.findOne({ mobile_number }).select("+password");
+    
     if (!student) {
-      return NextResponse.json({ error: 'Student not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Invalid mobile number or password" },
+        { status: 401 }
+      );
     }
 
-    // Check if password is not set (first time login)
-    if (!student.password) {
-      return NextResponse.json({ 
-        message: 'First time login, password setup required',
-        requiresSetup: true 
-      }, { status: 200 });
+    const isMatch = await student.comparePassword(password);
+    if (!isMatch) {
+      return NextResponse.json(
+        { error: "Invalid mobile number or password" },
+        { status: 401 }
+      );
     }
 
-    // If password is provided in request, verify it
-    if (password) {
-      const isMatch = await bcrypt.compare(password, student.password);
-      if (!isMatch) {
-        return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
-      }
-      
-      // Login successful
-      // In a real app, you'd set a session cookie or return a token here
-      // For this task, we'll just return success and the student info needed
-      return NextResponse.json({ 
-        message: 'Login successful',
+    if (student.status !== "Active") {
+      return NextResponse.json(
+        { error: "Account is not active" },
+        { status: 403 }
+      );
+    }
+
+    const token = jwt.sign(
+      { id: student._id, role: "student" },
+      process.env.JWT_SECRET!,
+      { expiresIn: "1d" }
+    );
+
+    const response = NextResponse.json(
+      { 
+        message: "Login successful",
         student: {
           _id: student._id,
           name: student.name,
-          roll_number: student.roll_number,
-          mobile_number: student.mobile_number
+          role: "student"
         }
-      });
-    } else {
-        // Password required but not provided
-        return NextResponse.json({ error: 'Password is required' }, { status: 400 });
-    }
+      },
+      { status: 200 }
+    );
 
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24, // 1 day
+      path: "/",
+    });
+
+    return response;
   } catch (error) {
-    console.error('Login error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Student login error:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

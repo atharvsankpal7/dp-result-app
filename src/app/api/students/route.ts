@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/connect';
 import Student from '@/lib/db/models/Student';
 import Division from '@/lib/db/models/Division';
-import '@/lib/db/models/Division';
+import Class from '@/lib/db/models/Class';
 
 export async function GET(request: NextRequest) {
   await connectDB();
@@ -63,7 +63,8 @@ export async function POST(request: NextRequest) {
       mother_name: body.mother_name,
       roll_number: body.roll_number,
       mobile_number: body.mobile_number,
-      division_id: body.division_id
+      division_id: body.division_id,
+      password: body.password
     });
 
     const populatedStudent = await student.populate({

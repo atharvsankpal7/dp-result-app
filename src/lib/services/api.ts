@@ -146,7 +146,9 @@ export const api = {
     name: string;
     mother_name: string;
     roll_number: string;
+    mobile_number: string;
     division_id: string;
+    password?: string;
   }) {
     const res = await fetch(`${BASE_URL}/students`, {
       method: 'POST',
@@ -164,7 +166,9 @@ export const api = {
     name?: string;
     mother_name?: string;
     roll_number?: string;
+    mobile_number?: string;
     division_id?: string;
+    password?: string;
   }) {
     const res = await fetch(`${BASE_URL}/students/${id}`, {
       method: 'PUT',

@@ -38,6 +38,7 @@ interface Student {
   name: string;
   mother_name: string;
   roll_number: string;
+  mobile_number: string;
   status: "Active" | "Inactive" | "Admission Cancelled";
   division_id: {
     _id: string;
@@ -62,14 +63,18 @@ const formSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   mother_name: z.string().min(1, { message: "Mother's name is required" }),
   roll_number: z.string().min(1, { message: "Roll number is required" }),
+  mobile_number: z.string().min(10, { message: "Mobile number is required" }),
   division_id: z.string().min(1, { message: "Division is required" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
 });
 
 const editFormSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   mother_name: z.string().min(1, { message: "Mother's name is required" }),
+  mobile_number: z.string().min(10, { message: "Mobile number is required" }),
   division_id: z.string().min(1, { message: "Division is required" }),
   status: z.enum(["Active", "Inactive", "Admission Cancelled"]),
+  password: z.string().optional(),
 });
 
 export default function StudentsPage() {
@@ -91,7 +96,9 @@ export default function StudentsPage() {
       name: "",
       mother_name: "",
       roll_number: "",
+      mobile_number: "",
       division_id: "",
+      password: "",
     },
   });
 
@@ -100,8 +107,10 @@ export default function StudentsPage() {
     defaultValues: {
       name: "",
       mother_name: "",
+      mobile_number: "",
       division_id: "",
       status: "Active",
+      password: "",
     },
   });
 
@@ -115,8 +124,10 @@ export default function StudentsPage() {
       editForm.reset({
         name: selectedStudent.name,
         mother_name: selectedStudent.mother_name,
+        mobile_number: selectedStudent.mobile_number,
         division_id: selectedStudent.division_id._id,
         status: selectedStudent.status,
+        password: "",
       });
     }
   }, [selectedStudent, editForm]);
@@ -321,6 +332,34 @@ export default function StudentsPage() {
                   )}
                 />
 
+                <FormField
+                  control={form.control}
+                  name="mobile_number"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mobile Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Mobile number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <div className="space-y-4">
                   <Select
                     value={selectedClass}
@@ -447,7 +486,7 @@ export default function StudentsPage() {
               </div>
               <div className="text-sm text-muted-foreground">
                 Upload an Excel file containing student details: Name, Mother&apos;s
-                Name, Roll Number
+                Name, Roll Number, Mobile Number
               </div>
             </div>
           </CardContent>
@@ -465,6 +504,7 @@ export default function StudentsPage() {
                 <tr>
                   <th className="py-3 px-4 text-left">Roll No</th>
                   <th className="py-3 px-4 text-left">Name</th>
+                  <th className="py-3 px-4 text-left">Mobile No</th>
                   <th className="py-3 px-4 text-left">Mother&apos;s Name</th>
                   <th className="py-3 px-4 text-left">Class</th>
                   <th className="py-3 px-4 text-left">Division</th>
@@ -477,6 +517,7 @@ export default function StudentsPage() {
                   <tr key={student._id} className="border-t">
                     <td className="py-3 px-4">{student.roll_number}</td>
                     <td className="py-3 px-4">{student.name}</td>
+                    <td className="py-3 px-4">{student.mobile_number}</td>
                     <td className="py-3 px-4">{student.mother_name}</td>
                     <td className="py-3 px-4">
                       {student.division_id?.class_id.name}
@@ -557,7 +598,35 @@ export default function StudentsPage() {
                 )}
               />
 
+              <FormField
+                control={editForm.control}
+                name="mobile_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mobile Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Mobile number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <div className="space-y-4">
+                <FormField
+                  control={editForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password (Leave blank to keep current)</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="New Password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <Select value={selectedClass} onValueChange={setSelectedClass}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select Class" />

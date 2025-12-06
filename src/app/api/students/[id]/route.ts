@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/connect';
 import Student from '@/lib/db/models/Student';
+import bcrypt from 'bcryptjs';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
@@ -26,6 +27,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const body = await request.json();
     const { id } = await params;
+
+    if (body.password) {
+      body.password = await bcrypt.hash(body.password, 10);
+    } 
+
     const student = await Student.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true

@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
           name: row.name,
           mother_name: row.mother_name,
           roll_number: row.roll_number,
+          mobile_number: row.mobile_number,
           division_id: division_id
         });
 
